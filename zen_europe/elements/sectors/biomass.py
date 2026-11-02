@@ -3,9 +3,14 @@ from zen_creator import Sector
 from zen_europe.elements.carriers.biomass_feedstocks import BIOMASS_FEEDSTOCKS
 from zen_europe.elements.carriers.biomass_pools import BIOMASS_POOLS
 from zen_europe.elements.conversion_technologies.biomass_routes import (
-    BIOMASS_ROUTE_TECHNOLOGIES,
+    BIOMASS_ROUTE_TECHNOLOGIES, CoDigestionMix
 )
-
+from zen_europe.elements.conversion_technologies.anaerobic_digestion import AnaerobicDigestion
+from zen_europe.elements.carriers.biogas import Biogas
+from zen_europe.elements.carriers.digestate import Digestate
+from zen_europe.elements.conversion_technologies.biogas_upgrading import (
+    BiogasUpgrading,
+)
 
 class BiomassSector(Sector):
     """Biomass supply: primary feedstocks with ENSPRESO potentials, the pooled
@@ -13,7 +18,7 @@ class BiomassSector(Sector):
     feedstock into its pools."""
 
     name = "biomass"
-    required_sectors = []
+    required_sectors = ["electricity", "heat", "gas"]
 
     def __init__(self) -> None:
         super().__init__()
@@ -21,4 +26,9 @@ class BiomassSector(Sector):
             *BIOMASS_FEEDSTOCKS,
             *BIOMASS_POOLS,
             *BIOMASS_ROUTE_TECHNOLOGIES,
+            CoDigestionMix,
+            AnaerobicDigestion,
+            BiogasUpgrading,
+            Biogas,
+            Digestate,
         ]

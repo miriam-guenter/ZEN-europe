@@ -36,6 +36,12 @@ class GasificationBiomass(BiomassPool):
 
     name: str = "gasif_biomass"
 
+class BiogasFeedstock(BiomassPool):
+    """Mixed feedstock for anaerobic digestion (wet biomass with at most the
+    maximum share of dry biomass)."""
+
+    name: str = "biogas_feedstock"
+
 class WetBiomassBiogas(BiomassPool):
     """Wet biomass for anaerobic digestion."""
 
@@ -73,6 +79,7 @@ class BiomassFastPyrolysis(BiomassPool):
 
 
 BIOMASS_POOLS = [
-    CombustionBiomass, GasificationBiomass,WetBiomassBiogas, DryBiomassBiogas,
-    CellulosicBiomass, OilyBiomass, BiomassSlowPyrolysis, BiomassFastPyrolysis,
+    CombustionBiomass, GasificationBiomass, BiogasFeedstock, WetBiomassBiogas, 
+    DryBiomassBiogas, CellulosicBiomass, OilyBiomass, BiomassSlowPyrolysis, 
+    BiomassFastPyrolysis,
 ]

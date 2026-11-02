@@ -1,14 +1,6 @@
 from zen_creator import Sector
 
-from zen_europe.elements.carriers.biomethane import Biomethane
 from zen_europe.elements.carriers.hydrogen import Hydrogen
-from zen_europe.elements.carriers.wet_biomass import WetBiomass
-from zen_europe.elements.conversion_technologies.anaerobic_digestion import (
-    AnaerobicDigestion,
-)
-from zen_europe.elements.conversion_technologies.biomethane_conversion import (
-    BiomethaneConversion,
-)
 from zen_europe.elements.conversion_technologies.electrolysis import Electrolysis
 from zen_europe.elements.conversion_technologies.fischer_tropsch import FischerTropsch
 from zen_europe.elements.conversion_technologies.fuel_cell import FuelCell
@@ -36,7 +28,7 @@ class HydrogenSector(Sector):
     """Hydrogen production, storage and transport, and its direct derivatives."""
 
     name = "hydrogen"
-    required_sectors = ["electricity", "heat", "district_heating", "gas"]
+    required_sectors = ["electricity", "heat", "district_heating", "gas", "biomass"]
 
     def __init__(self) -> None:
         super().__init__()
@@ -45,8 +37,6 @@ class HydrogenSector(Sector):
             FuelCell,
             SMR,
             Gasification,
-            AnaerobicDigestion,
-            BiomethaneConversion,
             FischerTropsch,
             Methanation,
             HydrogenPipeline,
@@ -57,6 +47,4 @@ class HydrogenSector(Sector):
             HydrogenFCShip,
             H2_DRI,
             Hydrogen,
-            Biomethane,
-            WetBiomass,
         ]

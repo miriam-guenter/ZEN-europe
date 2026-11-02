@@ -292,7 +292,7 @@ _RF_TECHS: dict[str, str] = {
     "gasification": "Gasifier, biomass, bio-SNG, medium - large scale",
     "electrolysis": "Hydrogen production via PEMEC electrolysis for 100 MW plant",
     "anaerobic_digestion": "Biogas plant, Basic plant, large [~ 6,000 Nm3 CH4/h]",
-    "biomethane_conversion": "Biogas upgrading - Amine scrubber [~6,000 Nm3 CH4/h)",
+    "biogas_upgrading": "Biogas upgrading - Amine scrubber [~6,000 Nm3 CH4/h)",
 }
 _RF_COST_PARS: dict[str, dict[str, tuple[str, float]]] = {
     "methanol_from_biomass": {
@@ -356,7 +356,7 @@ _RF_COST_PARS: dict[str, dict[str, tuple[str, float]]] = {
         # the current catalogue; mapped to fopex only, vopex is left unset.
         "fopex": ("Total O&M [k€/MW/year]", 1.0),
     },
-    "biomethane_conversion": {
+    "biogas_upgrading": {
         "capex": (
             "Specific investment, upgrading and methane reduction [k€/MW output]",
             1.0,
@@ -370,12 +370,12 @@ _RF_COST_PARS: dict[str, dict[str, tuple[str, float]]] = {
     },
 }
 _RF_SCENARIOS_DEFAULT = {"min": "Lower", "max": "Upper", "ref": "ctrl"}
-# anaerobic_digestion/biomethane_conversion use "Est" for the reference
+# anaerobic_digestion/biogas_upgrading use "Est" for the reference
 # scenario where every other DEA renewable-fuel technology uses "ctrl" -- the
 # legacy script always looked for "ctrl" and so silently never found a
 # reference-scenario value for these two technologies; ported correctly here.
 _RF_SCENARIOS_ALT = {"min": "Lower", "max": "Upper", "ref": "Est"}
-_RF_ALT_SCENARIO_TECHS = {"anaerobic_digestion", "biomethane_conversion"}
+_RF_ALT_SCENARIO_TECHS = {"anaerobic_digestion", "biogas_upgrading"}
 
 # The renewable-fuels workbook's `priceyear` column is entirely blank (unlike the other
 # three
@@ -1113,25 +1113,28 @@ class DEA(Dataset[pd.DataFrame]):
         """returns the conversion factor for anaerobic digestion.
 
         Values from the DEA technology catalogue for renewable fuels (Biogas
-        plant, Basic plant, large [~6,000 Nm3 CH4/h]), assuming a straw
-        feedstock.
+        plant, Basic plant, large [~6,000 Nm3 CH4/h]), share of output energy, 2020). 
+        The biogas yield of 55% of the feedstock energy is an assumption; the 
+        remaining feedstock energy is assumed to leave the plant with the digestate.
         https://ens.dk/en/analyses-and-statistics/technology-data-renewable-fuels
         """
+        biogas_yield = 0.55
         return [
-            {"wet_biomass": {"default_value": 1 / 0.55, "unit": "GWh/GWh"}},
+            {"biogas_feedstock": {"default_value": 1 / biogas_yield, "unit": "GWh/GWh"}},
             {"electricity": {"default_value": 0.0211, "unit": "GWh/GWh"}},
             {"heat": {"default_value": 0.0505, "unit": "GWh/GWh"}},
+            {"digestate": {"default_value": (1 - biogas_yield)/biogas_yield, "unit": "GWh/GWh"}},
         ]
 
-    def get_conversion_factor_biomethane_conversion(self):
-        """returns the conversion factor for biomethane conversion.
+    def get_conversion_factor_biogas_upgrading(self):
+        """returns the conversion factor for biogas upgrading.
 
         Values from the DEA technology catalogue for renewable fuels (Biogas
         upgrading - Amine scrubber [~6,000 Nm3 CH4/h]).
         https://ens.dk/en/analyses-and-statistics/technology-data-renewable-fuels
         """
         return [
-            {"biomethane": {"default_value": 1 / 0.9905, "unit": "GWh/GWh"}},
+            {"biogas": {"default_value": 1 / 0.9905, "unit": "GWh/GWh"}},
             {"heat": {"default_value": 0.1032 / 0.9905, "unit": "GWh/GWh"}},
         ]
 

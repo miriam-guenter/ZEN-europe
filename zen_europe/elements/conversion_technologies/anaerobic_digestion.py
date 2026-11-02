@@ -15,7 +15,7 @@ from zen_creator import Attribute, ConversionTechnology, SourceInformation
 
 class AnaerobicDigestion(ConversionTechnology):
     """Class containing all data and assumptions for anaerobic digestion
-    (wet biomass to biomethane)."""
+    (biogas production)."""
 
     name: str = "anaerobic_digestion"
 
@@ -26,29 +26,30 @@ class AnaerobicDigestion(ConversionTechnology):
 
     def _set_reference_carrier(self) -> Attribute:
         """
-        Sets the reference carrier of anaerobic digestion to biomethane.
+        Sets the reference carrier of anaerobic digestion to biogas.
         """
         return Attribute(
-            name="reference_carrier", default_value=["biomethane"], element=self
+            name="reference_carrier", default_value=["biogas"], element=self
         )
 
     def _set_input_carrier(self) -> Attribute:
         """
-        Sets the input carrier of anaerobic digestion to wet biomass,
-        electricity and heat.
+        Sets the input carrier of anaerobic digestion to biogas feedstock (wet and 
+        dry biomass from co-digestion), electricity and heat.
         """
+
         return Attribute(
             name="input_carrier",
-            default_value=["wet_biomass", "electricity", "heat"],
+            default_value=["biogas_feedstock", "electricity", "heat"],
             element=self,
         )
 
     def _set_output_carrier(self) -> Attribute:
         """
-        Set the output carrier of anaerobic digestion to biomethane.
+        Set the output carrier of anaerobic digestion to biogas & digestate.
         """
         return Attribute(
-            name="output_carrier", default_value=["biomethane"], element=self
+            name="output_carrier", default_value=["biogas", "digestate"], element=self
         )
 
     # ---------- Required methods that are called during object build ----------

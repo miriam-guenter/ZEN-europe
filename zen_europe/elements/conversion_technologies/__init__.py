@@ -7,7 +7,7 @@ from .biomass_boiler import BiomassBoiler
 from .biomass_boiler_DH import BiomassBoilerDH
 from .biomass_CHP import BiomassCHP
 from .biomass_plant import BiomassPlant
-from .biomethane_conversion import BiomethaneConversion
+from .biogas_upgrading import BiogasUpgrading
 from .carbon_storage import CarbonStorage
 from .cement_kiln import CementKiln
 from .DAC import DAC
@@ -98,7 +98,7 @@ __all__ = [
     "FischerTropsch",
     "Methanation",
     "AnaerobicDigestion",
-    "BiomethaneConversion",
+    "BiogasUpgrading",
     "FuelCell",
     "DAC",
     "Refining",

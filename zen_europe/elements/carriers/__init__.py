@@ -2,11 +2,12 @@ from .ammonia import Ammonia
 from .biomass_feedstocks import BIOMASS_FEEDSTOCKS
 from .biomass_pools import BIOMASS_POOLS
 from .biomass import Biomass
-from .biomethane import Biomethane
+from .biogas import Biogas
 from .carbon import Carbon
 from .clinker import Clinker
 from .crude_oil import CrudeOil
 from .diesel import Diesel
+from .digestate import Digestate
 from .district_heat import DistrictHeat
 from .electricity import Electricity
 from .fuel_for_cement import FuelForCement
@@ -39,7 +40,8 @@ __all__ = [
     "Electricity",
     "Ammonia",
     "Clinker",
-    "Biomethane",
+    "Biogas",
+    "Digestate",
     "Hydrogen",
     "PrimarySteel",
     "SecondarySteel",

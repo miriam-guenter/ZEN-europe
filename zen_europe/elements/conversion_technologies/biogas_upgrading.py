@@ -24,11 +24,11 @@ from zen_creator import (
 )
 
 
-class BiomethaneConversion(ConversionTechnology):
-    """Class containing all data and assumptions for biomethane conversion /
-    upgrading (biomethane to grid-quality natural gas)."""
+class BiogasUpgrading(ConversionTechnology):
+    """Class containing all data and assumptions for biogas conversion /
+    upgrading (biogas to grid-quality natural gas)."""
 
-    name: str = "biomethane_conversion"
+    name: str = "biogas_upgrading"
 
     def __init__(self, model: Model, power_unit: str = "MW"):
         super().__init__(model=model, power_unit=power_unit)
@@ -37,7 +37,7 @@ class BiomethaneConversion(ConversionTechnology):
 
     def _set_reference_carrier(self) -> Attribute:
         """
-        Sets the reference carrier of biomethane conversion to natural gas.
+        Sets the reference carrier of biogas upgrading to natural gas.
         """
         return Attribute(
             name="reference_carrier", default_value=["natural_gas"], element=self
@@ -45,15 +45,15 @@ class BiomethaneConversion(ConversionTechnology):
 
     def _set_input_carrier(self) -> Attribute:
         """
-        Sets the input carrier of biomethane conversion to biomethane and heat.
+        Sets the input carrier of biogas upgrading to biogas and heat.
         """
         return Attribute(
-            name="input_carrier", default_value=["biomethane", "heat"], element=self
+            name="input_carrier", default_value=["biogas", "heat"], element=self
         )
 
     def _set_output_carrier(self) -> Attribute:
         """
-        Set the output carrier of biomethane conversion to natural gas.
+        Set the output carrier of biogas upgrading to natural gas.
         """
         return Attribute(
             name="output_carrier", default_value=["natural_gas"], element=self
@@ -63,7 +63,7 @@ class BiomethaneConversion(ConversionTechnology):
 
     def _set_lifetime(self) -> Attribute:
         """
-        Sets the lifetime of biomethane conversion.
+        Sets the lifetime of biogas upgrading.
 
         """
         tech_db = TechnologyCostDatabase(
@@ -73,15 +73,15 @@ class BiomethaneConversion(ConversionTechnology):
 
     def _set_conversion_factor(self) -> Attribute:
         """
-        Return the conversion factor of biomethane conversion.
+        Return the conversion factor of biogas upgrading.
 
         """
         attr = self.conversion_factor
         dea_dataset = DEA(source_path=self.source_path)
-        cf = dea_dataset.get_conversion_factor_biomethane_conversion()
+        cf = dea_dataset.get_conversion_factor_biogas_upgrading()
         source = SourceInformation(
             description=(
-                "The conversion factor of biomethane conversion is obtained from "
+                "The conversion factor of biogas upgrading is obtained from "
                 ""
                 "the DEA dataset for renewable fuels"
             ),
@@ -92,7 +92,7 @@ class BiomethaneConversion(ConversionTechnology):
 
     def _set_construction_time(self) -> Attribute:
         """
-        Sets the construction time of biomethane conversion.
+        Sets the construction time of biogas upgrading.
 
         """
         if self.settings.investment.use_construction_times:
@@ -105,8 +105,7 @@ class BiomethaneConversion(ConversionTechnology):
 
     def _set_capex_specific_conversion(self) -> Attribute:
         """
-        Sets the specific capital expenditure (capex) for biomethane
-        conversion.
+        Sets the specific capital expenditure (capex) for biogas upgrading.
 
         Returns:
             Attribute: An Attribute object containing the specific capex data.
@@ -119,7 +118,7 @@ class BiomethaneConversion(ConversionTechnology):
     def _set_opex_specific_fixed(self) -> Attribute:
         """
         Sets the specific fixed operational expenditure (opex) for
-        biomethane conversion.
+        biogas upgrading.
 
         Returns:
             Attribute: An Attribute object containing the specific fixed opex data.
@@ -132,7 +131,7 @@ class BiomethaneConversion(ConversionTechnology):
     def _set_opex_specific_variable(self) -> Attribute:
         """
         Sets the specific variable operational expenditure (opex) for
-        biomethane conversion.
+        biogas upgrading.
 
         Returns:
             Attribute: An Attribute object containing the specific variable opex data.
@@ -144,7 +143,7 @@ class BiomethaneConversion(ConversionTechnology):
 
     def _set_capacity_existing(self) -> Attribute:
         """
-        Sets the existing capacity of biomethane conversion.
+        Sets the existing capacity of biogas upgrading.
 
         The existing capacity is obtained from the European Biogas Association's
         biomethane production statistics.
@@ -169,7 +168,7 @@ class BiomethaneConversion(ConversionTechnology):
 
     def _set_max_diffusion_rate(self) -> Attribute:
         """
-        Sets the maximum diffusion rate of biomethane conversion.
+        Sets the maximum diffusion rate of biogas upgrading.
         """
         if not self.settings.investment.use_diffusion_rates:
             return self.max_diffusion_rate
