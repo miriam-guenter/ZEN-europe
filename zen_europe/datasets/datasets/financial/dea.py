@@ -523,7 +523,10 @@ class DEA(Dataset[pd.DataFrame]):
         return data
 
     def _load(
-        self, source: str, rf_category_fixup: bool = False
+        self,
+        source: str,
+        rf_category_fixup: bool = False,
+        extra_technical_cats: tuple[str, ...] = (),
     ) -> tuple[pd.DataFrame, pd.DataFrame]:
         """Load one of DEA's "alldata_flat" workbooks and split it into
         financial/technical.
@@ -692,15 +695,17 @@ class DEA(Dataset[pd.DataFrame]):
     @staticmethod
     def _find_cost_par(tech_rows: pd.DataFrame, var_label: str) -> str | None:
         """DEA reports electric- and heat-basis figures under different par
-        strings; prefer the electric one, fall back to heat."""
+        strings; prefer the electric one, fall back to heat. O&M labels use
+        "EUR" in current catalogues and "Euro" in older ones"""
         for suffix in (
             ("MW_e", "MW_h") if var_label != "Variable O&M" else ("MWh_e", "MWh_h")
         ):
-            money = "MEUR" if var_label == "Nominal investment" else "Euro"
             year_str = "/y" if var_label == "Fixed O&M" else ""
-            par = f"{var_label} (*total) [{money}/{suffix}{year_str}]"
-            if (tech_rows["par"] == par).any():
-                return par
+            moneys = ("MEUR",) if var_label == "Nominal investment" else ("Euro", "EUR")
+            for money in moneys:
+                par = f"{var_label} (*total) [{money}/{suffix}{year_str}]"
+                if (tech_rows["par"] == par).any():
+                    return par
         return None
 
     @staticmethod

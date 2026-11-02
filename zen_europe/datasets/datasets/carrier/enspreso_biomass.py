@@ -63,7 +63,8 @@ class EnspresoBiomassAvailability(EnspresoBiomass):
     # -------- methods ------------------------
 
     def get_availability_import(
-        self, element: Carrier, biomass_types: list[str], scenario: str = "ENS_Med"
+        self, element: Carrier, biomass_types: list[str], scenario: str = "ENS_Med",
+        shares: dict[str, float] | None = None,
     ) -> Attribute:
         """
         Compute the import availability of a biomass carrier from ENSPRESO potentials.
@@ -78,13 +79,15 @@ class EnspresoBiomassAvailability(EnspresoBiomass):
         :param biomass_types:
             List of biomass energy-commodity codes to filter the ENSPRESO data.
         :param scenario: The scenario for which to compute the import availability.
-
+        :param shares: Optional share of each energy-commodity code assigned to
+            this carrier (see `_get_availability_import`).
+        
         Returns:
             Attribute: the element's `availability_import` attribute, updated
                 with the computed data.
         """
         reference_year_values, yearly_variation = self._compute_availability_import(
-            element=element, biomass_types=biomass_types, scenario=scenario
+            element=element, biomass_types=biomass_types, scenario=scenario, shares=shares
         )
 
         source = SourceInformation(
@@ -111,6 +114,7 @@ class EnspresoBiomassAvailability(EnspresoBiomass):
         name: str,
         ens_scenario: str,
         suffix: str,
+        shares: dict[str, float] | None = None,
     ) -> Scenario:
         """
         Build a scenario variation of the import availability for a
@@ -128,7 +132,7 @@ class EnspresoBiomassAvailability(EnspresoBiomass):
                 scenario.
         """
         reference_year_values, yearly_variation = self._compute_availability_import(
-            element=element, biomass_types=biomass_types, scenario=ens_scenario
+            element=element, biomass_types=biomass_types, scenario=ens_scenario, shares=shares
         )
         return Scenario(
             name,
@@ -138,7 +142,8 @@ class EnspresoBiomassAvailability(EnspresoBiomass):
         )
 
     def _compute_availability_import(
-        self, element: Carrier, biomass_types: list[str], scenario: str
+        self, element: Carrier, biomass_types: list[str], scenario: str,
+        shares: dict[str, float] | None = None
     ) -> tuple[pd.Series, pd.DataFrame]:
         """
         Compute the reference-year import availability and its yearly
@@ -154,7 +159,7 @@ class EnspresoBiomassAvailability(EnspresoBiomass):
                 its yearly variation relative to that reference year.
         """
         potential = self._get_availability_import(
-            biomass_types=biomass_types, scenario=scenario
+            biomass_types=biomass_types, scenario=scenario, shares=shares
         )
         potential = potential.groupby(["NUTS0", "Year"]).sum()["Value"].unstack()
         potential = (
@@ -176,7 +181,8 @@ class EnspresoBiomassAvailability(EnspresoBiomass):
         return reference_year_values, yearly_variation
 
     def get_availability_import_yearly(
-        self, element: Carrier, biomass_types: list[str], scenario: str = "ENS_Med"
+        self, element: Carrier, biomass_types: list[str], scenario: str = "ENS_Med",
+        shares: dict[str, float] | None = None,
     ) -> Attribute:
         """
         Compute the yearly import availability of a biomass carrier from ENSPRESO
@@ -196,7 +202,7 @@ class EnspresoBiomassAvailability(EnspresoBiomass):
                 with the computed data.
         """
         potential = self._get_availability_import(
-            biomass_types=biomass_types, scenario=scenario
+            biomass_types=biomass_types, scenario=scenario, shares=shares
         )
         potential = potential.groupby(["NUTS0", "Year"]).sum()["Value"].unstack()
         potential = potential / Constants.GJ_PER_MWH * 1000  # PJ/a -> GWh
@@ -312,7 +318,7 @@ class EnspresoBiomassPrice(EnspresoBiomass):
         assert (
             unit[0] == "Euro2010/GJ"
         ), f"Unexpected unit in ENSPRESO biomass price data: {unit[0]}"
-        data = table["NUTS0 Energy Commodity Cost "]
+        data = pd.to_numeric(table["NUTS0 Energy Commodity Cost "], errors="coerce")
 
         nodes = pd.Index(element.model.config.system.set_nodes)
         common_nodes = nodes.intersection(data.index.get_level_values("NUTS0").unique())
@@ -328,16 +334,23 @@ class EnspresoBiomassPrice(EnspresoBiomass):
         availability = availability.loc[common_nodes].sort_index()
         data_availability = data * availability
 
+        # Weight only by availability that has a price: ENSPRESO reports no cost
+        # for some codes (e.g. MINBIOLIQ1) or years. Years without any priced
+        # availability (e.g. energy crops in 2010) get no price and are filled by
+        # interpolate_missing_years below.
+        priced_availability = availability.reindex(data_availability.index).where(
+            data_availability.notna()
+        )
+
         price: pd.Series | pd.DataFrame
         if not regional_prices:
-            price = (
-                data_availability.groupby(["Year"]).sum()
-                / availability.groupby(["Year"]).sum()
-            )
+            weights = priced_availability.groupby(["Year"]).sum()
+            price = data_availability.groupby(["Year"]).sum() / weights.where(weights > 0)
+            price = price.dropna()
         else:
-            price = (
-                data_availability.groupby(["NUTS0", "Year"]).sum()
-                / availability.groupby(["NUTS0", "Year"]).sum()
+            weights = priced_availability.groupby(["NUTS0", "Year"]).sum()
+            price = data_availability.groupby(["NUTS0", "Year"]).sum() / weights.where(
+                weights > 0
             )
             price = price.unstack(level=0).T
 

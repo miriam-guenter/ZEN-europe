@@ -88,7 +88,7 @@ class BiomassCHP(ConversionTechnology):
         eff_el = eff_el.loc[reference_year]
         eff_th = eff_th.loc[reference_year]
         cf = [
-            {"biomass": {"default_value": 1 / eff_el, "unit": "GWh/GWh"}},
+            {"comb_biomass": {"default_value": 1 / eff_el, "unit": "GWh/GWh"}},
             {"district_heat": {"default_value": eff_th / eff_el, "unit": "GWh/GWh"}},
         ]
         source = SourceInformation(
