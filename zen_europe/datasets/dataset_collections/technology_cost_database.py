@@ -319,8 +319,12 @@ class TechnologyCostDatabase(DatasetCollection):
         plant_size: str | None = None,
         metric: str = "mean",
         reference_year: int | None = None,
+        variable: str = "efficiency",
     ) -> tuple[pd.Series, list[str]]:
         """Conversion efficiency [-] for `technology`, indexed by year.
+
+        `variable` selects the electrical/main efficiency ("efficiency") or, for
+        when also needed (e.g. CHP), the heat efficiency ("heat_efficiency").
 
         Returned directly as a `pd.Series` rather than an `Attribute`, since
         efficiency is technology-specific (e.g. it feeds a `conversion_factor`
@@ -329,14 +333,14 @@ class TechnologyCostDatabase(DatasetCollection):
         """
         data = self._aggregate(
             element.name,
-            "efficiency",
+            variable,
             plant_size,
             metric,
             reference_year or self.settings.time.reference_year,
         )
         optimization_years = pd.Index(element.settings.time.years)
         data = self._reindex_to_years(data, optimization_years)
-        agencies = self._extract_agencies(element.name, "efficiency", plant_size)
+        agencies = self._extract_agencies(element.name, variable, plant_size)
         assert not data.empty, (
             f"No efficiency data found for technology '{element.name}' "
             f"at plant size '{plant_size}' in any agency dataset."

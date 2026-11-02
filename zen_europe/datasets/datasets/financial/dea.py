@@ -67,6 +67,7 @@ _MAIN_TECHS: dict[str, tuple[str, str, str, str | None]] = {
     "heat_pump_DH": ("Heat pump, air source", "heat pump", "electricity", None),
     "waste_boiler_DH": ("Waste boiler", "boiler", "waste", "small"),
     "biomass_boiler_DH": ("Biomass boiler", "boiler", "wood chips", "medium"),
+    "biomass_CHP": ("Biomass CHP", "back pressure", "wood chips", "medium"),
     "electrode_boiler_DH": ("Electric boiler", "boiler", "electricity", None),
     "fuel_cell": ("Low temp PEM fuel cell", "back pressure", "hydrogen", "small"),
 }
@@ -504,7 +505,7 @@ class DEA(Dataset[pd.DataFrame]):
         if cache_path.exists() and not get_active_cache_settings().overwrite_dea:
             return pd.read_feather(cache_path).set_index(INDEX_NAMES)
 
-        financial, technical = self._load("main")
+        financial, technical = self._load("main", extra_technical_cats=("Technology-specific data",))
         ih_financial, ih_technical = self._load("ih")
         ccs_financial, ccs_technical = self._load("ccs")
         rf_financial, rf_technical = self._load("rf", rf_category_fixup=True)
@@ -538,6 +539,9 @@ class DEA(Dataset[pd.DataFrame]):
         (`rf_category_fixup=True` normalizes them to "Financial data", exactly as the
         legacy
         script did); every other source uses `cat` values that already match exactly.
+        `extra_technical_cats` adds further `cat` values to the technical rows; the
+        electricity & district heating workbook reports the heat efficiency of
+        back-pressure CHP plants under "Technology-specific data".
         """
         filename, url = _SOURCES[source]
         file_path = self.path / filename
@@ -551,7 +555,8 @@ class DEA(Dataset[pd.DataFrame]):
             )
             raw.loc[contains_financial_data, "cat"] = "Financial data"
         financial = self._clean(raw[raw["cat"] == "Financial data"])
-        technical = self._clean(raw[raw["cat"] == "Energy/technical data"])
+        technical = self._clean(raw[raw["cat"].isin(("Energy/technical data", *extra_technical_cats))]
+        )
         return financial, technical
 
     @staticmethod
@@ -711,12 +716,14 @@ class DEA(Dataset[pd.DataFrame]):
                 "Electrical efficiency (net, name plate) []",
                 "Heat efficiency (net, name plate) []",
             ],
+            "heat_efficiency": ["Heat efficiency (net, name plate) []"],
             "lifetime": ["Technical lifetime [years]"],
             "construction_time": ["Construction time [years]"],
         }
-        schema_units = {"efficiency": "1", "lifetime": "1", "construction_time": "1"}
+        schema_units = {"efficiency": "1", "heat_efficiency": "1", "lifetime": "1", "construction_time": "1"}
         source_units = {
             "efficiency": "-",
+            "heat_efficiency": "-",
             "lifetime": "years",
             "construction_time": "years",
         }
