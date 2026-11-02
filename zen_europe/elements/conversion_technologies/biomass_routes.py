@@ -33,6 +33,7 @@ class BiomassRoute(ConversionTechnology):
     feedstock -> technology allocation visible in the results."""
 
     name: str = "biomass_route"
+    subpath: ClassVar[str] = ""
     feedstock: ClassVar[str] = ""
     pool: ClassVar[str] = ""
 

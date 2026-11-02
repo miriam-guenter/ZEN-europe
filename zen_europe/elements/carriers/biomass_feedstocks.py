@@ -25,6 +25,7 @@ class BiomassFeedstock(Carrier):
     `_biomass_shares` / `_price_types`."""
 
     name: str = "biomass_feedstock"
+    subpath: ClassVar[str] = "" # intermediate base class: adds no folder level to the output path
 
     # ENSPRESO energy-commodity codes belonging to this feedstock
     _biomass_types: ClassVar[list[str]] = []

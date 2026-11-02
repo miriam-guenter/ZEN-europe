@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 if TYPE_CHECKING:
     from zen_creator import Model
@@ -14,6 +14,7 @@ class BiomassPool(Carrier):
     imported and are only supplied by biomass routing technologies."""
 
     name: str = "biomass_pool"
+    subpath: ClassVar[str] = "" # intermediate base class: adds no folder level to the output path
 
     def __init__(self, model: Model, power_unit: str = "MW"):
         super().__init__(model=model, power_unit=power_unit)
