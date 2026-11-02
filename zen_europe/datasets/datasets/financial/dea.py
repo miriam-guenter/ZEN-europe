@@ -369,13 +369,27 @@ _RF_COST_PARS: dict[str, dict[str, tuple[str, float]]] = {
         "vopex": ("Variable O&M [€/GJ output]", Constants.GJ_PER_MWH),
     },
 }
+
+# Renewable-fuel cost variables that only use a share of the reported figure:
+# (technology, variable) -> (par of the share, par of the total), both reported
+# by DEA on the same per-ton basis. The share is applied per estimate and year.
+# DEA's "Total O&M" of biogas plants includes the plant's own electricity and
+# heat, which the model already charges through the input carriers, so only the
+# O&M excluding electricity and heat is kept.
+_RF_COST_SHARES: dict[tuple[str, str], tuple[str, str]] = {
+    ("anaerobic_digestion", "fopex"): (
+        "- of which O&M, excl electricity and heat [€/(ton input/year)]",
+        "Total O&M [€/(ton input/year)]",
+    ),
+}
+
 _RF_SCENARIOS_DEFAULT = {"min": "Lower", "max": "Upper", "ref": "ctrl"}
 # anaerobic_digestion/biogas_upgrading use "Est" for the reference
 # scenario where every other DEA renewable-fuel technology uses "ctrl" -- the
 # legacy script always looked for "ctrl" and so silently never found a
 # reference-scenario value for these two technologies; ported correctly here.
-_RF_SCENARIOS_ALT = {"min": "Lower", "max": "Upper", "ref": "Est"}
-_RF_ALT_SCENARIO_TECHS = {"anaerobic_digestion", "biogas_upgrading"}
+# _RF_SCENARIOS_ALT = {"min": "Lower", "max": "Upper", "ref": "Est"}
+# _RF_ALT_SCENARIO_TECHS = {"anaerobic_digestion", "biogas_upgrading"}
 
 # The renewable-fuels workbook's `priceyear` column is entirely blank (unlike the other
 # three
@@ -936,11 +950,7 @@ class DEA(Dataset[pd.DataFrame]):
         """
         rows: list[tuple] = []
         for technology, dea_label in _RF_TECHS.items():
-            scenarios = (
-                _RF_SCENARIOS_ALT
-                if technology in _RF_ALT_SCENARIO_TECHS
-                else _RF_SCENARIOS_DEFAULT
-            )
+            scenarios = _RF_SCENARIOS_DEFAULT
             money_year_src = _RF_MONEY_YEAR_SRC.get(
                 technology, _RF_DEFAULT_MONEY_YEAR_SRC
             )
@@ -954,7 +964,15 @@ class DEA(Dataset[pd.DataFrame]):
                     sel = fin_rows[(fin_rows["par"] == par) & (fin_rows["est"] == est)]
                     if sel.empty:
                         continue
+                    share_pars = _RF_COST_SHARES.get((technology, variable))
                     for _, row in sel.iterrows():
+                        share = (
+                            1.0
+                            if share_pars is None
+                            else self._rf_cost_share(
+                                fin_rows, share_pars, est, int(row["year"])
+                            )
+                        )
                         rows.append(
                             (
                                 technology,
@@ -962,7 +980,7 @@ class DEA(Dataset[pd.DataFrame]):
                                 scenario,
                                 variable,
                                 int(row["year"]),
-                                float(row["val"]) * multiplier,
+                                float(row["val"]) * multiplier * share,
                                 schema_units[variable],
                                 money_year_src,
                                 float(row["val"]),
@@ -1008,7 +1026,29 @@ class DEA(Dataset[pd.DataFrame]):
                         )
                     )
         return rows
-
+    
+    @staticmethod
+    def _rf_cost_share(
+        fin_rows: pd.DataFrame, share_pars: tuple[str, str], est: str, year: int
+    ) -> float:
+        """Share of a reported renewable-fuel cost for one estimate and year
+        (see `_RF_COST_SHARES`)."""
+        values: dict[str, float] = {}
+        for par in share_pars:
+            sel = fin_rows[
+                (fin_rows["par"] == par)
+                & (fin_rows["est"] == est)
+                & (fin_rows["year"] == year)
+            ]
+            if sel.empty:
+                raise ValueError(
+                    f"DEA row '{par}' ({est}, {year}) needed to split a renewable-fuel "
+                    "cost is missing."
+                )
+            values[par] = float(sel["val"].iloc[0])
+        part_par, total_par = share_pars
+        return values[part_par] / values[total_par]
+    
     def _set_dh_distribution_data(self) -> pd.DataFrame:
         financial, technical = self._load("dh_transport")
         rows: list[tuple] = []

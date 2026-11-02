@@ -112,6 +112,9 @@ class AnaerobicDigestion(ConversionTechnology):
         Sets the specific fixed operational expenditure (opex) for anaerobic
         digestion.
 
+        Only DEA's O&M excluding electricity and heat is used, since the plant's
+        electricity and heat demand is covered by its input carriers.
+
         Returns:
             Attribute: An Attribute object containing the specific fixed opex data.
         """
