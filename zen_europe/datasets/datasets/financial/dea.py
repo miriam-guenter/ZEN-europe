@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 import pandas as pd
+import numpy as np
 from zen_creator.datasets.datasets.dataset import Dataset
 from zen_creator.datasets.datasets.metadata import MetaData
 
@@ -381,6 +382,18 @@ _RF_COST_SHARES: dict[tuple[str, str], tuple[str, str]] = {
         "- of which O&M, excl electricity and heat [€/(ton input/year)]",
         "Total O&M [€/(ton input/year)]",
     ),
+}
+
+# Renewable-fuel technologies whose "Lower"/"Upper" estimates are reported as
+# factors on the central estimate ("ctrl") rather than as absolute values
+# (e.g. 0.5 / 1.5 for the investment, 0.9 / 1.1 for O&M). They are converted to
+# absolute values before use.
+_RF_RELATIVE_BOUNDS_TECHS = {
+    "methanol_from_biomass",
+    "methanol_from_hydrogen",
+    "fischer_tropsch",
+    "methanation",
+    "biogas_methanation",
 }
 
 _RF_SCENARIOS_DEFAULT = {"min": "Lower", "max": "Upper", "ref": "ctrl"}
@@ -965,22 +978,29 @@ class DEA(Dataset[pd.DataFrame]):
                     if sel.empty:
                         continue
                     share_pars = _RF_COST_SHARES.get((technology, variable))
+                    relative = (
+                        technology in _RF_RELATIVE_BOUNDS_TECHS and est != scenarios["ref"]
+                    )
                     for _, row in sel.iterrows():
+                        year = int(row["year"])
                         share = (
                             1.0
                             if share_pars is None
-                            else self._rf_cost_share(
-                                fin_rows, share_pars, est, int(row["year"])
-                            )
+                            else self._rf_cost_share(fin_rows, share_pars, est, year)
                         )
+                        value = float(row["val"])
+                        if relative:
+                            value *= self._rf_reference_value(
+                                fin_rows, par, scenarios["ref"], year
+                            )
                         rows.append(
                             (
                                 technology,
                                 "M",
                                 scenario,
                                 variable,
-                                int(row["year"]),
-                                float(row["val"]) * multiplier * share,
+                                year,
+                                value * multiplier * share,
                                 schema_units[variable],
                                 money_year_src,
                                 float(row["val"]),
@@ -1048,6 +1068,21 @@ class DEA(Dataset[pd.DataFrame]):
             values[par] = float(sel["val"].iloc[0])
         part_par, total_par = share_pars
         return values[part_par] / values[total_par]
+
+    @staticmethod
+    def _rf_reference_value(
+        fin_rows: pd.DataFrame, par: str, ref_est: str, year: int
+    ) -> float:
+        """Central estimate of a renewable-fuel cost in `year`, interpolated
+        between reported years (see `_RF_RELATIVE_BOUNDS_TECHS`)."""
+        ref = fin_rows[(fin_rows["par"] == par) & (fin_rows["est"] == ref_est)]
+        if ref.empty:
+            raise ValueError(
+                f"DEA row '{par}' ({ref_est}) needed to scale relative cost bounds "
+                "is missing."
+            )
+        ref = ref.groupby("year")["val"].first().sort_index()
+        return float(np.interp(year, ref.index.astype(float), ref.to_numpy(float)))
     
     def _set_dh_distribution_data(self) -> pd.DataFrame:
         financial, technical = self._load("dh_transport")
