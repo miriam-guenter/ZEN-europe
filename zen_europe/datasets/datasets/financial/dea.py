@@ -289,7 +289,8 @@ _RF_TECHS: dict[str, str] = {
     # feedstock variants (large/small scale x straw/garden waste/digestate); we use the
     # large-scale, straw-feedstock variant, the closest continuation of the old entry.
     "pyrolysis": "Large scale slow pyrolysis (20 MW) - Straw feedstock",
-    "methanation": "SNG from Biogas",
+    "methanation": "SNG from Biogas", # change this (get technology data from other source)
+    "biogas_methanation": "SNG from Biogas",
     "gasification": "Gasifier, biomass, bio-SNG, medium - large scale",
     "electrolysis": "Hydrogen production via PEMEC electrolysis for 100 MW plant",
     "anaerobic_digestion": "Biogas plant, Basic plant, large [~ 6,000 Nm3 CH4/h]",
@@ -327,6 +328,11 @@ _RF_COST_PARS: dict[str, dict[str, tuple[str, float]]] = {
         ),
     },
     "methanation": {
+        "capex": ("Specific investment [M€/MW SNG]", 1000.0),
+        "fopex": ("Fixed O&M [M€/MW/year SNG]", 1000.0),
+        "vopex": ("Variable O&M [€/MWh SNG]", 1.0),
+    },
+    "biogas_methanation": {
         "capex": ("Specific investment [M€/MW SNG]", 1000.0),
         "fopex": ("Fixed O&M [M€/MW/year SNG]", 1000.0),
         "vopex": ("Variable O&M [€/MWh SNG]", 1.0),
@@ -1226,7 +1232,26 @@ class DEA(Dataset[pd.DataFrame]):
             {"biomass": {"default_value": 1 / efficiency, "unit": "GWh/GWh"}},
             {"heat": {"default_value": 0.2 / efficiency, "unit": "GWh/GWh"}},
         ]
+    
+    def get_conversion_factor_biogas_methanation(self):
+        """returns the conversion factor for biogas methanation.
 
+        Values from the DEA technology catalogue for renewable fuels (92
+        Methanation of Biogas, "SNG from Biogas"): per MWh of total input,
+        0.53 MWh biogas, 0.46 MWh hydrogen and 0.01 MWh electricity yield
+        0.89 MWh SNG and 0.10 MWh district heat. The CO2 in the biogas is
+        methanised with the hydrogen. Normalized to the SNG (natural gas)
+        reference carrier.
+        https://ens.dk/en/analyses-and-statistics/technology-data-renewable-fuels
+        """
+        sng_output = 0.89  # MWh SNG / MWh total input
+        return [
+            {"biogas": {"default_value": 0.53 / sng_output, "unit": "GWh/GWh"}},
+            {"hydrogen": {"default_value": 0.46 / sng_output, "unit": "GWh/GWh"}},
+            {"electricity": {"default_value": 0.01 / sng_output, "unit": "GWh/GWh"}},
+            {"district_heat": {"default_value": 0.10 / sng_output, "unit": "GWh/GWh"}},
+        ]
+    
     def get_conversion_factor_fischer_tropsch(self):
         """returns the conversion factor for fischer-tropsch.
 

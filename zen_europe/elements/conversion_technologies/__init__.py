@@ -7,6 +7,7 @@ from .biomass_boiler import BiomassBoiler
 from .biomass_boiler_DH import BiomassBoilerDH
 from .biomass_CHP import BiomassCHP
 from .biomass_plant import BiomassPlant
+from .biogas_methanation import BiogasMethanation
 from .biogas_upgrading import BiogasUpgrading
 from .carbon_storage import CarbonStorage
 from .cement_kiln import CementKiln
@@ -99,6 +100,7 @@ __all__ = [
     "Methanation",
     "AnaerobicDigestion",
     "BiogasUpgrading",
+    "BiogasMethanation",
     "FuelCell",
     "DAC",
     "Refining",

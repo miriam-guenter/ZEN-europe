@@ -10,6 +10,7 @@ from zen_europe.elements.conversion_technologies.HDT_FCEV import HDT_FCEV
 from zen_europe.elements.conversion_technologies.hydrogen_FC_ship import (
     HydrogenFCShip,
 )
+from zen_europe.elements.conversion_technologies.biogas_methanation import BiogasMethanation
 from zen_europe.elements.conversion_technologies.methanation import Methanation
 from zen_europe.elements.conversion_technologies.SMR import SMR
 from zen_europe.elements.retrofitting_technologies.hydrogen_to_cement_fuel import (
@@ -47,4 +48,5 @@ class HydrogenSector(Sector):
             HydrogenFCShip,
             H2_DRI,
             Hydrogen,
+            BiogasMethanation,
         ]
