@@ -41,7 +41,7 @@ class ElectricitySector(Sector):
     """Electricity generation, storage and transmission."""
 
     name = "electricity"
-    required_sectors = ["gas"]
+    required_sectors = ["gas", "biomass"]
 
     def __init__(self) -> None:
         super().__init__()

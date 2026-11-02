@@ -26,7 +26,7 @@ class DistrictHeatingSector(Sector):
     """District heating generation and grid."""
 
     name = "district_heating"
-    required_sectors = ["heat", "electricity", "gas"]
+    required_sectors = ["heat", "electricity", "gas", "biomass"]
 
     def __init__(self) -> None:
         super().__init__()
