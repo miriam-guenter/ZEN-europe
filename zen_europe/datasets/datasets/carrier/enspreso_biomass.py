@@ -226,7 +226,8 @@ class EnspresoBiomassAvailability(EnspresoBiomass):
         )
 
     def _get_availability_import(
-        self, biomass_types: list[str], scenario: str = "ENS_Med"
+        self, biomass_types: list[str], scenario: str = "ENS_Med",
+        shares: dict[str, float] | None = None
     ) -> pd.DataFrame:
         """
         Compute the import availability of a biomass carrier from ENSPRESO potentials.
@@ -237,14 +238,21 @@ class EnspresoBiomassAvailability(EnspresoBiomass):
         :param biomass_types:
             List of biomass energy-commodity codes to filter the ENSPRESO data.
         :param scenario: The scenario for which to compute the import availability.
-
+        :param shares: 
+            Optional share of each energy-commodity code assigned to
+            this carrier, for codes that are split across several carriers. Codes not in
+            `shares` are fully assigned.
         Returns:
             potential: DataFrame with the availability of biomass per node and year.
         """
         potential = self.data[
             (self.data["Scenario"] == scenario)
             & (self.data["Energy Commodity"].isin(biomass_types))
-        ]
+        ].copy()
+        if shares:
+            potential["Value"] *= (
+                potential["Energy Commodity"].map(shares).fillna(1.0)
+            )
         return potential
 
 

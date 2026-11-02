@@ -1,4 +1,6 @@
 from .ammonia import Ammonia
+from .biomass_feedstocks import BIOMASS_FEEDSTOCKS
+from .biomass_pools import BIOMASS_POOLS
 from .biomass import Biomass
 from .biomethane import Biomethane
 from .carbon import Carbon
@@ -30,8 +32,10 @@ from .waste import Waste
 from .wet_biomass import WetBiomass
 
 __all__ = [
-    "Biomass",
-    "WetBiomass",
+    "Biomass", #remove later
+    "WetBiomass", #remove later
+    "BIOMASS_FEEDSTOCKS",
+    "BIOMASS_POOLS",
     "Electricity",
     "Ammonia",
     "Clinker",
