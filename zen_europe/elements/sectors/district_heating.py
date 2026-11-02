@@ -4,6 +4,7 @@ from zen_europe.elements.carriers.district_heat import DistrictHeat
 from zen_europe.elements.conversion_technologies.biomass_boiler_DH import (
     BiomassBoilerDH,
 )
+from zen_europe.elements.conversion_technologies.biomass_CHP import BiomassCHP
 from zen_europe.elements.conversion_technologies.district_heating_grid import (
     DistrictHeatingGrid,
 )
@@ -35,6 +36,7 @@ class DistrictHeatingSector(Sector):
             OilBoilerDH,
             WasteBoilerDH,
             BiomassBoilerDH,
+            BiomassCHP,
             HardCoalBoilerDH,
             ElectrodeBoilerDH,
             DistrictHeatingGrid,

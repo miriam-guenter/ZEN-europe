@@ -65,6 +65,7 @@ class TechnologyDiffusionMannhardt(Dataset[dict[str, pd.DataFrame]]):
         "run-of-river_hydro",
         "biomass_plant",
         "biomass_plant_CCS",
+        "biomass_CHP",
         "oil_plant",
         "waste_plant",
         "lng_terminal",

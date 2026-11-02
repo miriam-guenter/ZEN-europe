@@ -4,6 +4,7 @@ from .BEV import BEV
 from .BF_BOF import BF_BOF
 from .biomass_boiler import BiomassBoiler
 from .biomass_boiler_DH import BiomassBoilerDH
+from .biomass_CHP import BiomassCHP
 from .biomass_plant import BiomassPlant
 from .biomethane_conversion import BiomethaneConversion
 from .carbon_storage import CarbonStorage
@@ -72,6 +73,7 @@ __all__ = [
     "NaturalGasTurbine",
     "Nuclear",
     "OilPlant",
+    "BiomassCHP",
     "BiomassPlant",
     "WastePlant",
     "NaturalGasBoiler",

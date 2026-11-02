@@ -7,6 +7,7 @@ from zen_europe.elements.carriers.lignite import Lignite
 from zen_europe.elements.carriers.oil import Oil
 from zen_europe.elements.carriers.uranium import Uranium
 from zen_europe.elements.carriers.waste import Waste
+from zen_europe.elements.conversion_technologies.biomass_CHP import BiomassCHP
 from zen_europe.elements.conversion_technologies.biomass_plant import BiomassPlant
 from zen_europe.elements.conversion_technologies.hard_coal_plant import HardCoalPlant
 from zen_europe.elements.conversion_technologies.lignite_coal_plant import (
@@ -53,6 +54,7 @@ class ElectricitySector(Sector):
             Nuclear,
             RunOfRiverHydro,
             LigniteCoalPlant,
+            BiomassCHP,
             BiomassPlant,
             OilPlant,
             WastePlant,
