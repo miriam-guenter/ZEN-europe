@@ -53,6 +53,9 @@ _TECHS: dict[str, str] = {
     "methanation": "Methanation",
     "SMR": "Steam Methane Reforming",
     "DAC": "CO_{2} direct air capture",
+    "biogas_upgrading": "Biogas Upgrade",
+    "anaerobic_digestion": "Biogas digester",
+    "biomass_CHP": "CHP BiomassHeating",
 }
 _VARIABLES: dict[str, str] = {
     "capex": "Capex",

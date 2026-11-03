@@ -45,7 +45,7 @@ class BiomassBoilerDH(ConversionTechnology):
         """
         Sets the input carrier of district heating biomass boilers to biomass.
         """
-        return Attribute(name="input_carrier", default_value=["biomass"], element=self)
+        return Attribute(name="input_carrier", default_value=["comb_biomass"], element=self)
 
     def _set_output_carrier(self) -> Attribute:
         """

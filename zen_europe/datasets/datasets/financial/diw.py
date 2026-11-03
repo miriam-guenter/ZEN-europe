@@ -36,6 +36,7 @@ _COST_TECHS: dict[str, str] = {
     "biomass_plant_CCS": "BiomassPowerPlant+CCTS",
     "oil_plant": "OilPowerPlant(CCGT)",
     "fuel_cell": "FuelCell",
+    "biomass_CHP": "BiomassCHP",
 }
 # efficiency sheet uses yet another label set, only covering thermal plants
 _EFFICIENCY_TECHS: dict[str, str] = {

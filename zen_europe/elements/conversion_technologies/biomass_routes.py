@@ -24,7 +24,7 @@ BIOMASS_ROUTES: dict[str, list[str]] = {
     "biomass_slow_pyrolysis": [
         "stemwood", "forestry_residues", "src_crops", "perennial_grasses",
         "agri_residues_woody", "agri_residues_herb", "wood_waste",
-        "biowaste", "sludge",
+        "biowaste", "sludge", "digestate"
     ],
     "biomass_fast_pyrolysis": ["stemwood","forestry_residues", "src_crops"],
     "biogas_feedstock": ["wet_biomass_biogas"],
