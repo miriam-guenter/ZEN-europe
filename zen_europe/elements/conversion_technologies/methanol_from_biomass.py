@@ -37,9 +37,9 @@ class MethanolFromBiomass(ConversionTechnology):
 
     def _set_input_carrier(self) -> Attribute:
         """
-        Sets the input carrier of methanol from biomass to biomass.
+        Sets the input carrier of methanol from biomass to gasifier biomass.
         """
-        return Attribute(name="input_carrier", default_value=["biomass"], element=self)
+        return Attribute(name="input_carrier", default_value=["gasif_biomass"], element=self)
 
     def _set_output_carrier(self) -> Attribute:
         """
@@ -48,7 +48,7 @@ class MethanolFromBiomass(ConversionTechnology):
         """
         return Attribute(
             name="output_carrier",
-            default_value=["methanol", "district_heat"],
+            default_value=["methanol", "district_heat", "electricity"],
             element=self,
         )
 
