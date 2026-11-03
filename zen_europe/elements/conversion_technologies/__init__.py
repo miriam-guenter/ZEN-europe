@@ -36,6 +36,7 @@ from .ICE_petrol import ICE_petrol
 from .lignite_coal_plant import LigniteCoalPlant
 from .lng_terminal import LNGTerminal
 from .methanation import Methanation
+from .methanol_from_biogas import MethanolFromBiogas
 from .methanol_from_biomass import MethanolFromBiomass
 from .methanol_from_hydrogen import MethanolFromHydrogen
 from .methanol_from_natural_gas import MethanolFromNaturalGas
@@ -105,6 +106,7 @@ __all__ = [
     "DAC",
     "Refining",
     "MethanolFromNaturalGas",
+    "MethanolFromBiogas",
     "MethanolFromBiomass",
     "MethanolFromHydrogen",
     "OlefinFromMethanol",

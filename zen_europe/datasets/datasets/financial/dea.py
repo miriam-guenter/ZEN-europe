@@ -295,6 +295,7 @@ _RF_TECHS: dict[str, str] = {
     "electrolysis": "Hydrogen production via PEMEC electrolysis for 100 MW plant",
     "anaerobic_digestion": "Biogas plant, Basic plant, large [~ 6,000 Nm3 CH4/h]",
     "biogas_upgrading": "Biogas upgrading - Amine scrubber [~6,000 Nm3 CH4/h)",
+    "methanol_from_biogas": "Methanol from biogas and hydrogen",
 }
 _RF_COST_PARS: dict[str, dict[str, tuple[str, float]]] = {
     "methanol_from_biomass": {
@@ -375,6 +376,11 @@ _RF_COST_PARS: dict[str, dict[str, tuple[str, float]]] = {
         ),
         "vopex": ("Variable O&M [€/GJ output]", Constants.GJ_PER_MWH),
     },
+        "methanol_from_biogas": {
+        "capex": ("Specific investment [M€/MW-methanol]", 1000.0),
+        "fopex": ("Fixed O&M [k€/[MW-methanol/year]]", 1.0),
+        "vopex": ("Variable O&M [€/MWh-methanol]", 1.0),
+    },
 }
 
 # Renewable-fuel cost variables that only use a share of the reported figure:
@@ -397,6 +403,7 @@ _RF_COST_SHARES: dict[tuple[str, str], tuple[str, str]] = {
 _RF_RELATIVE_BOUNDS_TECHS = {
     "methanol_from_biomass",
     "methanol_from_hydrogen",
+    "methanol_from_biogas",
     "fischer_tropsch",
     "methanation",
     "biogas_methanation",
@@ -1365,6 +1372,45 @@ class DEA(Dataset[pd.DataFrame]):
             {
                 "electricity": {
                     "default_value": 0.02 / methanol_production_biomass,
+                    "unit": "GWh/GWh",
+                }
+            },
+        ]
+
+    def get_conversion_factor_methanol_from_biogas(self):
+        """returns the conversion factor for methanol from biogas.
+
+        Values from the DEA technology catalogue for renewable fuels (97
+        Methanol from biogas and hydrogen), per ton of methanol: 4.0959 MWh
+        biogas, 2.48 MWh hydrogen, 0.34 MWh electricity and 0.153 MWh net
+        steam, which is modelled as heat. Oxygen and water inputs and the
+        effluent gas output are not modelled; methanol (19.9 GJ/ton) is the
+        only output. Normalized to the methanol reference carrier.
+        https://ens.dk/en/analyses-and-statistics/technology-data-renewable-fuels
+        """
+        methanol_mwh_per_ton = 19.9 / Constants.GJ_PER_MWH  # DEA LHV, 19.9 GJ/ton
+        return [
+            {
+                "biogas": {
+                    "default_value": 4.0959 / methanol_mwh_per_ton,
+                    "unit": "GWh/GWh",
+                }
+            },
+            {
+                "hydrogen": {
+                    "default_value": 2.48 / methanol_mwh_per_ton,
+                    "unit": "GWh/GWh",
+                }
+            },
+            {
+                "electricity": {
+                    "default_value": 0.34 / methanol_mwh_per_ton,
+                    "unit": "GWh/GWh",
+                }
+            },
+            {
+                "heat": {
+                    "default_value": 0.153 / methanol_mwh_per_ton,
                     "unit": "GWh/GWh",
                 }
             },

@@ -108,6 +108,7 @@ class TechnologyDiffusionMannhardt(Dataset[dict[str, pd.DataFrame]]):
         "cement_post_comb",
         "methanol_from_natural_gas",
         "methanol_from_hydrogen",
+        "methanol_from_biogas",
         "methanol_from_biomass",
         "fischer_tropsch",
         "DAC",

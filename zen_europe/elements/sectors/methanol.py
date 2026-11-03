@@ -2,6 +2,9 @@ from zen_creator import Sector
 
 from zen_europe.elements.carriers.methanol import Methanol
 from zen_europe.elements.carriers.olefin import Olefin
+from zen_europe.elements.conversion_technologies.methanol_from_biogas import (
+    MethanolFromBiogas,
+)
 from zen_europe.elements.conversion_technologies.methanol_from_biomass import (
     MethanolFromBiomass,
 )
@@ -36,6 +39,7 @@ class MethanolSector(Sector):
         "hydrogen",
         "refining",
         "gas",
+        "biomass",
     ]
 
     def __init__(self) -> None:
@@ -43,6 +47,7 @@ class MethanolSector(Sector):
         self.elements = [
             MethanolFromNaturalGas,
             MethanolFromBiomass,
+            MethanolFromBiogas,
             OlefinFromMethanol,
             MethanolPipeline,
             OlefinPipeline,
