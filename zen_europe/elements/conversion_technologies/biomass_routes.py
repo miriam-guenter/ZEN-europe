@@ -28,6 +28,9 @@ BIOMASS_ROUTES: dict[str, list[str]] = {
     ],
     "biomass_fast_pyrolysis": ["stemwood","forestry_residues", "src_crops"],
     "biogas_feedstock": ["wet_biomass_biogas"],
+    # TODO: interim 1:1 route; replace by an upgrading (hydrotreating) technology
+    # with hydrogen demand and costs (research dataset still needed)
+    "oil": ["pyrolysis_oil"],
 }
 
 

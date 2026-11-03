@@ -56,7 +56,8 @@ from .oil_to_naphtha_conversion import OilToNaphthaConversion
 from .olefin_from_methanol import OlefinFromMethanol
 from .olefin_from_naphtha import OlefinFromNaphtha
 from .photovoltaics import Photovoltaics
-from .pyrolysis import Pyrolysis
+from .pyrolysis_slow import SlowPyrolysis
+from .pyrolysis_fast import FastPyrolysis
 from .refining import Refining
 from .run_of_river_hydro import RunOfRiverHydro
 from .SMR import SMR
@@ -117,7 +118,8 @@ __all__ = [
     "H2_DRI",
     "NG_DRI",
     "EAF",
-    "Pyrolysis",
+    "SlowPyrolysis",
+    "FastPyrolysis",
     "DieselICEShip",
     "HydrogenFCShip",
     "MethanolICEShip",

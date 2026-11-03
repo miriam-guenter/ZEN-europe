@@ -14,6 +14,10 @@ from zen_europe.elements.conversion_technologies.biogas_upgrading import (
 from zen_europe.elements.retrofitting_technologies.biogas_upgrading_CCS import (
     BiogasUpgradingCCS,
 )   
+from zen_europe.elements.conversion_technologies.pyrolysis_fast import FastPyrolysis
+from zen_europe.elements.conversion_technologies.pyrolysis_slow import SlowPyrolysis
+from zen_europe.elements.carriers.pyrolysis_oil import PyrolysisOil
+
 
 class BiomassSector(Sector):
     """Biomass supply: primary feedstocks with ENSPRESO potentials, the pooled
@@ -21,7 +25,7 @@ class BiomassSector(Sector):
     feedstock into its pools."""
 
     name = "biomass"
-    required_sectors = ["electricity", "heat", "gas"]
+    required_sectors = ["electricity", "heat", "gas", "district_heating"]
 
     def __init__(self) -> None:
         super().__init__()
@@ -35,4 +39,7 @@ class BiomassSector(Sector):
             Biogas,
             Digestate,
             BiogasUpgradingCCS,
+            PyrolysisOil,
+            FastPyrolysis,
+            SlowPyrolysis,
         ]

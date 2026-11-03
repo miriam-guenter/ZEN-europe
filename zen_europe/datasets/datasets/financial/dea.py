@@ -293,7 +293,8 @@ _RF_TECHS: dict[str, str] = {
     # DEA reorganized its old single "Slow pyrolysis ... from straw" entry into scale x
     # feedstock variants (large/small scale x straw/garden waste/digestate); we use the
     # large-scale, straw-feedstock variant, the closest continuation of the old entry.
-    "pyrolysis": "Large scale slow pyrolysis (20 MW) - Straw feedstock",
+    "pyrolysis_slow": "Large scale slow pyrolysis (20 MW) - Straw feedstock",
+    "pyrolysis_fast": "Fast pyrolysis (25 MW) - Wood feedstock",
     "methanation": "SNG from Biogas", # change this (get technology data from other source)
     "biogas_methanation": "SNG from Biogas",
     "gasification": "Gasifier, biomass, bio-SNG, medium - large scale",
@@ -326,10 +327,17 @@ _RF_COST_PARS: dict[str, dict[str, tuple[str, float]]] = {
     # per-MW/year figure (previously reported separately); mapped to fopex only, vopex
     # is left
     # unset rather than guessing a split.
-    "pyrolysis": {
+    "pyrolysis_slow": {
         "capex": ("Specific investment [M€/MW output from pyrolysis process]", 1000.0),
         "fopex": (
             "Fixed and variabel O&M [M€/MW output from pyrolysis process/year]",
+            1000.0,
+        ),
+    },
+    "pyrolysis_fast": {
+        "capex": ("Specific investment [M€/MW output from pyrolysis process]", 1000.0),
+        "fopex": (
+            "Fixed and variable O&M [M€/MW output from pyrolysis process/year]",
             1000.0,
         ),
     },
@@ -427,7 +435,7 @@ _RF_SCENARIOS_DEFAULT = {"min": "Lower", "max": "Upper", "ref": "ctrl"}
 # DEA workbooks); its own Index sheet states the price basis instead: "All cost data is
 # in 2020
 # EURO, except the chapters on pyrolysis which are in 2025 EURO".
-_RF_MONEY_YEAR_SRC: dict[str, int] = {"pyrolysis": 2025}
+_RF_MONEY_YEAR_SRC: dict[str, int] = {"pyrolysis_slow": 2025, "pyrolysis_fast": 2025}
 _RF_DEFAULT_MONEY_YEAR_SRC = 2020
 
 
@@ -1302,24 +1310,64 @@ class DEA(Dataset[pd.DataFrame]):
             },
         ]
 
-    def get_conversion_factor_pyrolysis(self):
-        """returns the conversion factor for pyrolysis.
+    def get_conversion_factor_pyrolysis_slow(self):
+        """returns the conversion factor for slow pyrolysis.
 
-        Values from the DEA technology catalogue for renewable fuels (Large
-        scale slow pyrolysis (20 MW), straw feedstock), normalized to the
-        oil reference carrier (biochar/pyrolysis-oil producing process:
-        0.99 MWh biomass input, 0.04 MWh electricity, 0.22 MWh oil and
-        0.05 MWh district heat, plus 0.4 MWh-equivalent hard coal/biochar
-        output, all per MWh of biomass processed).
+        Values from the DEA technology catalogue for renewable fuels (87 Large
+        scale slow pyrolysis (20 MW), straw feedstock), per MWh of total input:
+        0.9592 MWh biomass and 0.0408 MWh electricity yield 0.4508 MWh biochar
+        (modelled as hard coal), 0.1918 MWh pyrolysis oil and 0.2398 MWh heat
+        from burning the pyrolysis gas on site. Normalized to the pyrolysis oil
+        reference carrier.
         https://ens.dk/en/analyses-and-statistics/technology-data-renewable-fuels
         """
-        oil_output = 0.19  # MWh oil / MWh input processed (reference carrier)
+        oil_output = 0.1918  # MWh pyrolysis oil / MWh total input (reference carrier)
         return [
-            {"biomass": {"default_value": 0.96 / oil_output, "unit": "GWh/GWh"}},
-            {"electricity": {"default_value": 0.04 / oil_output, "unit": "GWh/GWh"}},
-            {"district_heat": {"default_value": 0.24 / oil_output, "unit": "GWh/GWh"}},
-            {"hard_coal": {"default_value": 0.45 / oil_output, "unit": "GWh/GWh"}},
+            {"biomass_slow_pyrolysis": {
+                "default_value": 0.9592 / oil_output, 
+                "unit": "GWh/GWh"}},
+            {"electricity": {"default_value": 0.0408 / oil_output, "unit": "GWh/GWh"}},
+            {"district_heat": {"default_value": 0.2398 / oil_output, "unit": "GWh/GWh"}},
+            {"hard_coal": {"default_value": 0.4508 / oil_output, "unit": "GWh/GWh"}},
         ]
+
+        # assumed efficiency of burning the low-calorific pyrolysis gas on site
+    _PYROLYSIS_GAS_COMBUSTION_EFFICIENCY = 0.9
+
+    def get_conversion_factor_pyrolysis_fast(self):
+        """returns the conversion factor for fast pyrolysis.
+
+        Values from the DEA technology catalogue for renewable fuels (86 Fast
+        pyrolysis (25 MW), wood feedstock), per MWh of total input: 0.93 MWh
+        biomass, 0.01 MWh electricity and 0.06 MWh heat yield 0.70 MWh pyrolysis
+        oil and 0.15 MWh pyrolysis gas. The low-calorific pyrolysis gas is
+        assumed to be burned on site (90% efficiency) to cover the heat demand;
+        the remainder is supplied as district heat. Normalized to the pyrolysis
+        oil reference carrier.
+        https://ens.dk/en/analyses-and-statistics/technology-data-renewable-fuels
+        """
+        oil_output = 0.70  # MWh pyrolysis oil / MWh total input
+        net_heat = 0.15 * self._PYROLYSIS_GAS_COMBUSTION_EFFICIENCY - 0.06
+        return [
+            {
+                "biomass_fast_pyrolysis": {
+                    "default_value": 0.93 / oil_output,
+                    "unit": "GWh/GWh",
+                }
+            },
+            {"electricity": {"default_value": 0.01 / oil_output, "unit": "GWh/GWh"}},
+            {"district_heat": {"default_value": net_heat / oil_output, "unit": "GWh/GWh"}},
+        ]
+
+    def get_cost_multiplier_pyrolysis_fast(self) -> float:
+        """returns the cost multiplier for fast pyrolysis.
+
+        DEA reports the costs per MW of output from the pyrolysis process
+        (0.70 MWh oil + 0.15 MWh gas per MWh input), while the technology is
+        sized by its pyrolysis oil output, so the costs are rebased by
+        (oil + gas) / oil.
+        """
+        return (0.70 + 0.15) / 0.70
 
     def get_conversion_factor_haber_bosch(self):
         """returns the conversion factor for the Haber-Bosch process.

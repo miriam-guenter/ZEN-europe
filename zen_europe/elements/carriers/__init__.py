@@ -25,6 +25,7 @@ from .oil import Oil
 from .olefin import Olefin
 from .passenger_mileage import PassengerMileage
 from .primary_steel import PrimarySteel
+from .pyrolysis_oil import PyrolysisOil
 from .secondary_steel import SecondarySteel
 from .shipping import Shipping
 from .truck_mileage import TruckMileage
@@ -62,6 +63,7 @@ __all__ = [
     "NaturalGas",
     "Heat",
     "PassengerMileage",
+    "PyrolysisOil",
     "TruckMileage",
     "CrudeOil",
     "FuelForCement",
