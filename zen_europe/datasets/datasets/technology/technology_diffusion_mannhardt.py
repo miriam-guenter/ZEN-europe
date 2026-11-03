@@ -84,6 +84,7 @@ class TechnologyDiffusionMannhardt(Dataset[dict[str, pd.DataFrame]]):
         "SMR",
         "SMR_CCS",
         "biogas_upgrading",
+        "biogas_upgrading_CCS",
         "biogas_methanation",
         "power_line",
         "natural_gas_pipeline",

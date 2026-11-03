@@ -160,6 +160,7 @@ _CCS_TECHS: dict[str, str] = {
     "SMR_CCS": (
         "Post-combustion carbon capture retrofit - 100 MW(th) WtE or biomass CHP plant"
     ),
+    "biogas_upgrading_CCS": "Liquefaction for biogas plant retrofit",
 }
 # DAC has no reported variable O&M figure.
 _CCS_COST_PARS: dict[str, dict[str, str]] = {
@@ -171,6 +172,10 @@ _CCS_COST_PARS: dict[str, dict[str, str]] = {
         "capex": "Specific investment [mill €/[tCO2/hour]] (CO2 output)",
         "fopex": "Fixed O&M [mill €/[tCO2/hour]] (CO2 output)",
         "vopex": "Variable O&M [€/tCO2] (CO2 output)",
+    },
+    "biogas_upgrading_CCS": {
+        "capex": "Investment Compression & Liquefaction - 2 t CO₂/h [mill €/(tLCO2/h)]",
+        "fopex": "Fixed O&M 2 t CO₂/h [mill €/(tCO2/hour)] (CO2 output)",
     },
 }
 _CCS_SCENARIOS = {"min": "Lower", "max": "Upper", "ref": "Est"}
@@ -446,13 +451,18 @@ def _convert_main_unit(unit_src: str, variable: str) -> float:
 def _convert_ccs_unit(unit_src: str, variable: str) -> float:
     """Multiplier from a DEA carbon-capture source unit to `CO2_BASIS_UNITS`.
 
-    Source unit strings are inconsistently bracketed across technologies
-    (`millEUR/(tCO2/hour)` vs `millEUR/[tCO2/hour`), so this matches on
-    normalized substrings rather than exact strings.
+    Source unit strings are inconsistently written across technologies
+    (`millEUR/(tCO2/hour)`, `millEUR/[tCO2/hour`, `millEUR/(tLCO2/h)` for liquid
+    CO2), so this matches on normalized substrings rather than exact strings.
     """
-    normalized = unit_src.lower().replace(" ", "")
+    normalized = (
+        unit_src.lower()
+        .replace(" ", "")
+        .replace("tlco2", "tco2")
+        .replace("tco2/hour", "tco2/h")
+    )
     multiplier = 1e6 if "mill" in normalized else 1.0
-    if variable in ("capex", "fopex") and "tco2/hour" in normalized:
+    if variable in ("capex", "fopex") and "tco2/h" in normalized:
         return multiplier
     if variable == "vopex" and normalized == "eur/tco2":
         return multiplier
@@ -1448,6 +1458,32 @@ class DEA(Dataset[pd.DataFrame]):
             {"natural_gas": {"default_value": 0.833, "unit": "GWh/kilotCO2"}},
             {"electricity": {"default_value": 0.03, "unit": "GWh/kilotCO2"}},
         ]
+
+    def get_conversion_factor_biogas_upgrading_CCS(self):
+        """returns the conversion factor for biogas upgrading CCS.
+
+        Electricity demand for drying, compressing and liquefying the CO2
+        off-gas of biogas upgrading, from the DEA technology catalogue for
+        carbon capture, transport and storage (Liquefaction for biogas plant
+        retrofit, 2025): 68 kWh/tCO2 compression, 2 kWh/tCO2 drying and
+        63 kWh/tCO2 liquefaction. The CO2 is already separated by the
+        upgrading, so no capture heat is needed.
+        https://ens.dk/en/analyses-and-statistics/technology-data-carbon-capture-transport-and-storage
+        """
+        electricity = (68 + 2 + 63) / 1000  # kWh/tCO2 -> GWh/kilotCO2
+        return [{"electricity": {"default_value": electricity, "unit": "GWh/kilotCO2"}}]
+
+    def get_co2_content_biogas(self) -> float:
+        """returns the CO2 contained in raw biogas [tCO2/MWh biogas].
+
+        From the DEA technology catalogue for renewable fuels (Biogas plant,
+        Basic plant, large): 86,477 tCO2/year alongside 52.123 mill. Nm3
+        CH4/year, with a methane lower heating value of 35.8 MJ/Nm3.
+        https://ens.dk/en/analyses-and-statistics/technology-data-renewable-fuels
+        """
+        co2_ton_per_year = 86_477
+        ch4_mwh_per_year = 52.123e6 * 35.8 / (Constants.GJ_PER_MWH * 1000)
+        return co2_ton_per_year / ch4_mwh_per_year
 
     def get_conversion_factor_district_heating_grid(self):
         """returns the conversion factor for district heating grids.

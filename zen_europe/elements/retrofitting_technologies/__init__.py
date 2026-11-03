@@ -8,6 +8,7 @@ from .natural_gas_turbine_CCS import NaturalGasTurbineCCS
 from .NG_DRI_CCS import NG_DRI_CCS
 from .SMR_CCS import SMR_CCS
 from .waste_to_cement_fuel import WasteToCementFuel
+from .biogas_upgrading_CCS import BiogasUpgradingCCS
 
 __all__ = [
     "NaturalGasTurbineCCS",
@@ -20,4 +21,5 @@ __all__ = [
     "HydrogenToCementFuel",
     "WasteToCementFuel",
     "BiomassToCementFuel",
+    "BiogasUpgradingCCS",
 ]

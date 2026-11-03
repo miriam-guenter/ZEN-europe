@@ -11,6 +11,9 @@ from zen_europe.elements.carriers.digestate import Digestate
 from zen_europe.elements.conversion_technologies.biogas_upgrading import (
     BiogasUpgrading,
 )
+from zen_europe.elements.retrofitting_technologies.biogas_upgrading_CCS import (
+    BiogasUpgradingCCS,
+)   
 
 class BiomassSector(Sector):
     """Biomass supply: primary feedstocks with ENSPRESO potentials, the pooled
@@ -31,4 +34,5 @@ class BiomassSector(Sector):
             BiogasUpgrading,
             Biogas,
             Digestate,
+            BiogasUpgradingCCS,
         ]
