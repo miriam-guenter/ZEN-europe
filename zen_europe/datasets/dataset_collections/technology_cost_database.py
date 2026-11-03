@@ -105,8 +105,13 @@ class TechnologyCostDatabase(DatasetCollection):
         plant_size: str | None = None,
         metric: str = "mean",
         proxy_element_name: str | None = None,
+        multiplier: float = 1.0,
     ) -> Attribute:
-        """Specific investment cost for `element`'s technology."""
+        """Specific investment cost for `element`'s technology.
+        
+        `multiplier` rebases a cost reported on another basis (e.g. per MW of
+        fuel input) onto the technology's reference carrier.
+        """
         return self._set_technology_attribute(
             element,
             element.capex_specific_conversion,
@@ -116,6 +121,7 @@ class TechnologyCostDatabase(DatasetCollection):
             description="specific investment cost (CAPEX)",
             annual_values=True,
             proxy_element_name=proxy_element_name,
+            multiplier=multiplier,
         )
 
     def get_opex_specific_fixed(
@@ -124,6 +130,7 @@ class TechnologyCostDatabase(DatasetCollection):
         plant_size: str | None = None,
         metric: str = "mean",
         proxy_element_name: str | None = None,
+        multiplier: float = 1.0,
     ) -> Attribute:
         """Fixed operational cost for `element`'s technology."""
         return self._set_technology_attribute(
@@ -135,6 +142,7 @@ class TechnologyCostDatabase(DatasetCollection):
             description="fixed operational cost",
             annual_values=True,
             proxy_element_name=proxy_element_name,
+            multiplier=multiplier,
         )
 
     def get_opex_specific_variable(
@@ -143,6 +151,7 @@ class TechnologyCostDatabase(DatasetCollection):
         plant_size: str | None = None,
         metric: str = "mean",
         proxy_element_name: str | None = None,
+        multiplier: float = 1.0,
     ) -> Attribute:
         """Variable operational cost for `element`'s technology."""
         return self._set_technology_attribute(
@@ -154,6 +163,7 @@ class TechnologyCostDatabase(DatasetCollection):
             description="variable operational cost",
             annual_values=False,
             proxy_element_name=proxy_element_name,
+            multiplier=multiplier,
         )
 
     def get_capex_specific_storage(

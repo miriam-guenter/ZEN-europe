@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from zen_europe.datasets.dataset_collections.technology_cost_database import (
     TechnologyCostDatabase,
@@ -39,14 +39,14 @@ class Gasification(ConversionTechnology):
         """
         Sets the input carrier of gasification to biomass.
         """
-        return Attribute(name="input_carrier", default_value=["biomass"], element=self)
+        return Attribute(name="input_carrier", default_value=["gasif_biomass"], element=self)
 
     def _set_output_carrier(self) -> Attribute:
         """
         Set the output carrier of gasification to natural gas and heat.
         """
         return Attribute(
-            name="output_carrier", default_value=["natural_gas", "heat"], element=self
+            name="output_carrier", default_value=["natural_gas", "district_heat"], element=self
         )
 
     # ---------- Required methods that are called during object build ----------
@@ -96,9 +96,32 @@ class Gasification(ConversionTechnology):
         else:
             return self.construction_time
 
+    def _get_fuel_input_multiplier(self) -> float:
+        """
+        Return the biomass input per unit of SNG output.
+
+        DEA reports the costs of the gasifier per MW of fuel input, while the
+        technology is sized by its SNG (natural gas) output, so the costs are
+        multiplied by this factor to rebase them onto the reference carrier.
+        The factor is read from the conversion factor of the input carrier, so
+        it follows any change of the input carrier or the efficiency.
+        """
+        input_carrier = cast(list[str], self.input_carrier.default_value)[0]
+        conversion_factors = cast(
+            list[dict[str, dict[str, float]]], self.conversion_factor.default_value
+        )
+        return next(
+            entry[input_carrier]["default_value"]
+            for entry in conversion_factors
+            if input_carrier in entry
+        )
+
     def _set_capex_specific_conversion(self) -> Attribute:
         """
         Sets the specific capital expenditure (capex) for gasification.
+
+        DEA reports the specific investment per MW of fuel input, so it is
+        rebased onto the SNG output (see `_get_fuel_input_multiplier`).
 
         Returns:
             Attribute: An Attribute object containing the specific capex data.
@@ -106,11 +129,16 @@ class Gasification(ConversionTechnology):
         tech_db = TechnologyCostDatabase(
             settings=self.settings, source_path=self.source_path
         )
-        return tech_db.get_capex_specific_conversion(self)
+        return tech_db.get_capex_specific_conversion(
+            self, multiplier=self._get_fuel_input_multiplier()
+        )
 
     def _set_opex_specific_fixed(self) -> Attribute:
         """
         Sets the specific fixed operational expenditure (opex) for gasification.
+
+        DEA reports the fixed O&M per MW of fuel input, so it is rebased onto
+        the SNG output (see `_get_fuel_input_multiplier`).
 
         Returns:
             Attribute: An Attribute object containing the specific fixed opex data.
@@ -118,11 +146,16 @@ class Gasification(ConversionTechnology):
         tech_db = TechnologyCostDatabase(
             settings=self.settings, source_path=self.source_path
         )
-        return tech_db.get_opex_specific_fixed(self)
+        return tech_db.get_opex_specific_fixed(
+            self, multiplier=self._get_fuel_input_multiplier()
+        )
 
     def _set_opex_specific_variable(self) -> Attribute:
         """
         Sets the specific variable operational expenditure (opex) for gasification.
+
+        DEA reports the variable O&M per MWh of fuel input, so it is rebased onto
+        the SNG output (see `_get_fuel_input_multiplier`).
 
         Returns:
             Attribute: An Attribute object containing the specific variable opex data.
@@ -130,7 +163,9 @@ class Gasification(ConversionTechnology):
         tech_db = TechnologyCostDatabase(
             settings=self.settings, source_path=self.source_path
         )
-        return tech_db.get_opex_specific_variable(self)
+        return tech_db.get_opex_specific_variable(
+            self, multiplier=self._get_fuel_input_multiplier()
+        )
 
     def _set_max_diffusion_rate(self) -> Attribute:
         """

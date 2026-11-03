@@ -1246,10 +1246,10 @@ class DEA(Dataset[pd.DataFrame]):
         """
         efficiency = 0.6
         return [
-            {"biomass": {"default_value": 1 / efficiency, "unit": "GWh/GWh"}},
-            {"heat": {"default_value": 0.2 / efficiency, "unit": "GWh/GWh"}},
+            {"gasif_biomass": {"default_value": 1 / efficiency, "unit": "GWh/GWh"}},
+            {"district_heat": {"default_value": 0.2 / efficiency, "unit": "GWh/GWh"}},
         ]
-    
+
     def get_conversion_factor_biogas_methanation(self):
         """returns the conversion factor for biogas methanation.
 
@@ -1368,7 +1368,7 @@ class DEA(Dataset[pd.DataFrame]):
         methanol_production_biomass = 0.58
         return [
             {
-                "biomass": {
+                "gasif_biomass": {
                     "default_value": 1 / methanol_production_biomass,
                     "unit": "GWh/GWh",
                 }
