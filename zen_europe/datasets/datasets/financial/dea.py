@@ -305,6 +305,8 @@ _RF_TECHS: dict[str, str] = {
     "FAME": "Vegetable Oil FAME",
     "ethanol_1G_starch": "1st Generation Ethanol",
     "ethanol_cellulosic": "Cellulosic Ethanol",
+    "HVO_jet": "HVO Jet Fuel",
+    "HVO_diesel": "HVO / renwable diesel",
 }
 _RF_COST_PARS: dict[str, dict[str, tuple[str, float]]] = {
     "methanol_from_biomass": {
@@ -414,6 +416,16 @@ _RF_COST_PARS: dict[str, dict[str, tuple[str, float]]] = {
         "fopex": ("Fixed O&M [M€/MW/year Ethanol]", 1000.0),
         "vopex": ("Variable O&M [€/MW Ethanol]", 1.0),
     },
+        "HVO_jet": {
+        "capex": ("Specific investment [M €/MW HVO Jet]", 1000.0),
+        "fopex": ("Fixed O&M [M €/MW/year]", 1000.0),
+        "vopex": ("Variable O&M [€/MWh]", 1.0),
+    },
+    "HVO_diesel": {
+        "capex": ("Specific investment [M €/MW]", 1000.0),
+        "fopex": ("Fixed O&M [M €/MW/year]", 1000.0),
+        "vopex": ("Variable O&M [€/MWh]", 1.0),
+    },
 }
 
 # Renewable-fuel cost variables that only use a share of the reported figure:
@@ -443,6 +455,8 @@ _RF_RELATIVE_BOUNDS_TECHS = {
     "FAME",
     "ethanol_1G_starch",
     "ethanol_cellulosic",
+    "HVO_jet",
+    "HVO_diesel",
 }
 
 _RF_SCENARIOS_DEFAULT = {"min": "Lower", "max": "Upper", "ref": "ctrl"}
@@ -1536,6 +1550,47 @@ class DEA(Dataset[pd.DataFrame]):
                 }
             },
         ]
+
+    def get_conversion_factor_HVO_jet(self):
+        """returns the conversion factor for HVO jet fuel.
+
+        Values from the DEA technology catalogue for renewable fuels (103 HVO jet
+        fuel), per MWh of total input: 0.779 MWh vegetable oil, 0.099 MWh
+        hydrogen, 0.119 MWh natural gas and 0.003 MWh electricity yield 0.66 MWh
+        jet fuel (modelled as kerosene) and 0.0651 MWh naphtha. The LPG, fuel gas
+        and district heat co-products are not modelled. Normalized to the
+        kerosene reference carrier.
+        https://ens.dk/en/analyses-and-statistics/technology-data-renewable-fuels
+        """
+        jet_output = 0.66  # MWh jet fuel / MWh total input
+        return [
+            {"oily_biomass": {"default_value": 0.779 / jet_output, "unit": "GWh/GWh"}},
+            {"hydrogen": {"default_value": 0.099 / jet_output, "unit": "GWh/GWh"}},
+            {"natural_gas": {"default_value": 0.119 / jet_output, "unit": "GWh/GWh"}},
+            {"electricity": {"default_value": 0.003 / jet_output, "unit": "GWh/GWh"}},
+            {"naphtha": {"default_value": 0.0651 / jet_output, "unit": "GWh/GWh"}},
+        ]
+
+    def get_conversion_factor_HVO_diesel(self):
+        """returns the conversion factor for HVO renewable diesel.
+
+        Values from the DEA technology catalogue for renewable fuels (104 HVO
+        renewable diesel), per MWh of total input: 0.881 MWh vegetable oil,
+        0.105 MWh hydrogen, 0.007 MWh natural gas and 0.008 MWh electricity yield
+        0.85 MWh HVO (modelled as diesel) and 0.066 MWh naphtha. The LPG, fuel
+        gas and district heat co-products are not modelled. Normalized to the
+        diesel reference carrier.
+        https://ens.dk/en/analyses-and-statistics/technology-data-renewable-fuels
+        """
+        hvo_output = 0.85  # MWh HVO / MWh total input
+        return [
+            {"oily_biomass": {"default_value": 0.881 / hvo_output, "unit": "GWh/GWh"}},
+            {"hydrogen": {"default_value": 0.105 / hvo_output, "unit": "GWh/GWh"}},
+            {"natural_gas": {"default_value": 0.007 / hvo_output, "unit": "GWh/GWh"}},
+            {"electricity": {"default_value": 0.008 / hvo_output, "unit": "GWh/GWh"}},
+            {"naphtha": {"default_value": 0.066 / hvo_output, "unit": "GWh/GWh"}},
+        ]
+    
     def get_conversion_factor_ethanol_1G(self):
         """returns the conversion factor for first generation ethanol.
 

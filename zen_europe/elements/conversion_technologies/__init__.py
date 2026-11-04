@@ -18,8 +18,9 @@ from .EAF import EAF
 from .electrode_boiler import ElectrodeBoiler
 from .electrode_boiler_DH import ElectrodeBoilerDH
 from .electrolysis import Electrolysis
-from .ethanol_1G_starch import Ethanol1G
+from .ethanol_1G_starch import Ethanol1GStarch
 from .ethanol_cellulosic import EthanolCellulosic
+from .ethanol_to_gasoline import EthanolToGasoline
 from .FAME import FAME
 from .fischer_tropsch import FischerTropsch
 from .fuel_cell import FuelCell
@@ -33,6 +34,8 @@ from .HDT_diesel import HDT_diesel
 from .HDT_FCEV import HDT_FCEV
 from .heat_pump import HeatPump
 from .heat_pump_DH import HeatPumpDH
+from .HVO_diesel import HVODiesel
+from .HVO_jet import HVOJet
 from .hydrogen_FC_ship import HydrogenFCShip
 from .ICE_diesel import ICE_diesel
 from .ICE_petrol import ICE_petrol
@@ -138,6 +141,9 @@ __all__ = [
     "HDT_BET",
     "HDT_FCEV",
     "FAME",
-    "Ethanol1G",
+    "Ethanol1GStarch",
     "EthanolCellulosic",
+    "EthanolToGasoline",
+    "HVODiesel",
+    "HVOJet",
 ]

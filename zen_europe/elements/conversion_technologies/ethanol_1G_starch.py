@@ -21,7 +21,7 @@ from zen_creator import (
 )
 
 
-class Ethanol1G(ConversionTechnology):
+class Ethanol1GStarch(ConversionTechnology):
     """Class containing all data and assumptions for first generation ethanol
     production by fermentation of starch crops (grain)."""
 

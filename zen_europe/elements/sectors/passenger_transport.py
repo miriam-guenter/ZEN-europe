@@ -7,6 +7,8 @@ from zen_europe.elements.conversion_technologies.BEV import BEV
 from zen_europe.elements.conversion_technologies.ICE_diesel import ICE_diesel
 from zen_europe.elements.conversion_technologies.ICE_petrol import ICE_petrol
 from zen_europe.elements.conversion_technologies.FAME import FAME
+from zen_europe.elements.conversion_technologies.ethanol_to_gasoline import EthanolToGasoline
+from zen_europe.elements.conversion_technologies.HVO_diesel import HVODiesel
 
 
 class PassengerTransportSector(Sector):
@@ -25,4 +27,6 @@ class PassengerTransportSector(Sector):
             Diesel,
             PassengerMileage,
             FAME,
+            EthanolToGasoline,
+            HVODiesel,
         ]

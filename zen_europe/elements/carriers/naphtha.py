@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import numpy as np
+
 if TYPE_CHECKING:
     from zen_creator.model import Model
 
@@ -32,4 +34,28 @@ class Naphtha(Carrier):
             default_value=0,
             element=self,
             unit=self.power_unit,
+        )
+
+    def _set_availability_export(self) -> Attribute:
+        """
+        Return the export availability of naphtha. Unlimited, so that naphtha
+        produced as a co-product (e.g. by HVO plants) beyond the demand of the
+        chemical industry can always leave the system.
+        """
+        return Attribute(
+            "availability_export",
+            default_value=np.inf,
+            element=self,
+            unit=self.power_unit,
+        )
+
+    def _set_availability_export_yearly(self) -> Attribute:
+        """
+        Return the yearly export availability of naphtha (unlimited).
+        """
+        return Attribute(
+            "availability_export_yearly",
+            default_value=np.inf,
+            element=self,
+            unit=self.energy_unit,
         )

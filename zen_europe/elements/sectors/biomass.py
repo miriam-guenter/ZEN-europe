@@ -19,7 +19,7 @@ from zen_europe.elements.conversion_technologies.pyrolysis_slow import SlowPyrol
 from zen_europe.elements.carriers.pyrolysis_oil import PyrolysisOil
 from zen_europe.elements.conversion_technologies.FAME import FAME
 from zen_europe.elements.carriers.ethanol import Ethanol
-from zen_europe.elements.conversion_technologies.ethanol_1G_starch import Ethanol1G
+from zen_europe.elements.conversion_technologies.ethanol_1G_starch import Ethanol1GStarch
 from zen_europe.elements.conversion_technologies.ethanol_cellulosic import (
     EthanolCellulosic,
 )
@@ -27,7 +27,9 @@ from zen_europe.elements.retrofitting_technologies.ethanol_CCS import (
     Ethanol1GStarchCCS,
     EthanolCellulosicCCS,
 )
-
+from zen_europe.elements.conversion_technologies.ethanol_to_gasoline import EthanolToGasoline
+from zen_europe.elements.conversion_technologies.HVO_diesel import HVODiesel
+from zen_europe.elements.conversion_technologies.HVO_jet import HVOJet
 
 class BiomassSector(Sector):
     """Biomass supply: primary feedstocks with ENSPRESO potentials, the pooled
@@ -35,7 +37,7 @@ class BiomassSector(Sector):
     feedstock into its pools."""
 
     name = "biomass"
-    required_sectors = ["electricity", "heat", "gas", "district_heating"]
+    required_sectors = ["electricity", "heat", "gas", "district_heating", "refining"]
 
     def __init__(self) -> None:
         super().__init__()
@@ -54,8 +56,11 @@ class BiomassSector(Sector):
             SlowPyrolysis,
             FAME,
             Ethanol,
-            Ethanol1G,
+            Ethanol1GStarch,
             EthanolCellulosic,
             Ethanol1GStarchCCS,
             EthanolCellulosicCCS,
+            EthanolToGasoline,
+            HVODiesel,
+            HVOJet,
         ]
