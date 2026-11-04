@@ -303,6 +303,8 @@ _RF_TECHS: dict[str, str] = {
     "biogas_upgrading": "Biogas upgrading - Amine scrubber [~6,000 Nm3 CH4/h)",
     "methanol_from_biogas": "Methanol from biogas and hydrogen",
     "FAME": "Vegetable Oil FAME",
+    "ethanol_1G_starch": "1st Generation Ethanol",
+    "ethanol_cellulosic": "Cellulosic Ethanol",
 }
 _RF_COST_PARS: dict[str, dict[str, tuple[str, float]]] = {
     "methanol_from_biomass": {
@@ -400,6 +402,18 @@ _RF_COST_PARS: dict[str, dict[str, tuple[str, float]]] = {
         "fopex": ("Fixed O&M [M €/MW/year]", 1000.0),
         "vopex": ("Variable O&M [€/MWh]", 1.0),
     },
+    "ethanol_1G_starch": {
+        "capex": ("Specific investment [M€/MW Ethanol]", 1000.0),
+        "fopex": ("Fixed O&M [M€/MW/year]", 1000.0),
+        "vopex": ("Variable O&M [€/MWh]", 1.0),
+    },
+    # DEA labels the variable O&M "[€/MW Ethanol]", but its per-ton figure
+    # confirms it is per MWh of ethanol.
+    "ethanol_cellulosic": {
+        "capex": ("Specific investment [M€/MW Ethanol]", 1000.0),
+        "fopex": ("Fixed O&M [M€/MW/year Ethanol]", 1000.0),
+        "vopex": ("Variable O&M [€/MW Ethanol]", 1.0),
+    },
 }
 
 # Renewable-fuel cost variables that only use a share of the reported figure:
@@ -427,6 +441,8 @@ _RF_RELATIVE_BOUNDS_TECHS = {
     "methanation",
     "biogas_methanation",
     "FAME",
+    "ethanol_1G_starch",
+    "ethanol_cellulosic",
 }
 
 _RF_SCENARIOS_DEFAULT = {"min": "Lower", "max": "Upper", "ref": "ctrl"}
@@ -1520,7 +1536,63 @@ class DEA(Dataset[pd.DataFrame]):
                 }
             },
         ]
+    def get_conversion_factor_ethanol_1G(self):
+        """returns the conversion factor for first generation ethanol.
 
+        Values from the DEA technology catalogue for renewable fuels (105 First
+        generation ethanol, grain-based), per MWh of total input: 0.83 MWh
+        feedstock, 0.15 MWh natural gas and 0.02 MWh electricity yield 0.46 MWh
+        ethanol and 0.27 MWh distillers' dried grains (DDG, not yet modelled).
+        Normalized to the ethanol reference carrier.
+        https://ens.dk/en/analyses-and-statistics/technology-data-renewable-fuels
+        """
+        ethanol_output = 0.46  # MWh ethanol / MWh total input
+        return [
+            {"starch_crops": {"default_value": 0.83 / ethanol_output, "unit": "GWh/GWh"}},
+            {"natural_gas": {"default_value": 0.15 / ethanol_output, "unit": "GWh/GWh"}},
+            {"electricity": {"default_value": 0.02 / ethanol_output, "unit": "GWh/GWh"}},
+        ]
+
+    def get_conversion_factor_ethanol_cellulosic(self):
+        """returns the conversion factor for cellulosic ethanol.
+
+        Values from the DEA technology catalogue for renewable fuels (106
+        Cellulosic ethanol), per MWh of feedstock: 0.29 (2020) / 0.37 (2030) MWh
+        ethanol and 0.04 / 0.05 MWh electricity; the lignin residue covers the
+        process heat. The values are interpolated to 2026, since the efficiency
+        improves strongly until 2030. Normalized to the ethanol reference carrier.
+        https://ens.dk/en/analyses-and-statistics/technology-data-renewable-fuels
+        """
+        ethanol_output = 0.29 + (0.37 - 0.29) * 0.6  # 2026, MWh/MWh feedstock
+        electricity_output = 0.04 + (0.05 - 0.04) * 0.6  # 2026
+        return [
+            {
+                "cellulosic_biomass": {
+                    "default_value": 1 / ethanol_output,
+                    "unit": "GWh/GWh",
+                }
+            },
+            {
+                "electricity": {
+                    "default_value": electricity_output / ethanol_output,
+                    "unit": "GWh/GWh",
+                }
+            },
+        ]
+
+    def get_co2_from_ethanol_fermentation(self) -> float:
+        """returns the CO2 released by fermentation per unit of ethanol
+        [tCO2/MWh ethanol].
+
+        From the fermentation stoichiometry (C6H12O6 -> 2 C2H5OH + 2 CO2, and the
+        same CO2-to-ethanol ratio for C5 sugars): 88/92 = 0.957 tCO2 per ton of
+        ethanol, with the DEA ethanol heating value of 26.9 GJ/ton. This is the
+        theoretical value, an upper bound for the recoverable CO2.
+        """
+        co2_per_ton_ethanol = 2 * 44.01 / (2 * 46.07)
+        ethanol_mwh_per_ton = 26.9 / Constants.GJ_PER_MWH
+        return co2_per_ton_ethanol / ethanol_mwh_per_ton
+    
     def get_conversion_factor_DAC(self):
         """returns the conversion factor for DAC.
 

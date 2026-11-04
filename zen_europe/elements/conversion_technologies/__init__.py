@@ -18,6 +18,8 @@ from .EAF import EAF
 from .electrode_boiler import ElectrodeBoiler
 from .electrode_boiler_DH import ElectrodeBoilerDH
 from .electrolysis import Electrolysis
+from .ethanol_1G_starch import Ethanol1G
+from .ethanol_cellulosic import EthanolCellulosic
 from .FAME import FAME
 from .fischer_tropsch import FischerTropsch
 from .fuel_cell import FuelCell
@@ -136,4 +138,6 @@ __all__ = [
     "HDT_BET",
     "HDT_FCEV",
     "FAME",
+    "Ethanol1G",
+    "EthanolCellulosic",
 ]
