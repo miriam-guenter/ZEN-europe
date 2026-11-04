@@ -17,6 +17,7 @@ from zen_europe.elements.retrofitting_technologies.biogas_upgrading_CCS import (
 from zen_europe.elements.conversion_technologies.pyrolysis_fast import FastPyrolysis
 from zen_europe.elements.conversion_technologies.pyrolysis_slow import SlowPyrolysis
 from zen_europe.elements.carriers.pyrolysis_oil import PyrolysisOil
+from zen_europe.elements.conversion_technologies.FAME import FAME
 
 
 class BiomassSector(Sector):
@@ -42,4 +43,5 @@ class BiomassSector(Sector):
             PyrolysisOil,
             FastPyrolysis,
             SlowPyrolysis,
+            FAME,
         ]

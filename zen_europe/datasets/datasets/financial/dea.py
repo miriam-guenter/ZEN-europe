@@ -302,6 +302,7 @@ _RF_TECHS: dict[str, str] = {
     "anaerobic_digestion": "Biogas plant, Basic plant, large [~ 6,000 Nm3 CH4/h]",
     "biogas_upgrading": "Biogas upgrading - Amine scrubber [~6,000 Nm3 CH4/h)",
     "methanol_from_biogas": "Methanol from biogas and hydrogen",
+    "FAME": "Vegetable Oil FAME",
 }
 _RF_COST_PARS: dict[str, dict[str, tuple[str, float]]] = {
     "methanol_from_biomass": {
@@ -389,10 +390,15 @@ _RF_COST_PARS: dict[str, dict[str, tuple[str, float]]] = {
         ),
         "vopex": ("Variable O&M [€/GJ output]", Constants.GJ_PER_MWH),
     },
-        "methanol_from_biogas": {
+    "methanol_from_biogas": {
         "capex": ("Specific investment [M€/MW-methanol]", 1000.0),
         "fopex": ("Fixed O&M [k€/[MW-methanol/year]]", 1.0),
         "vopex": ("Variable O&M [€/MWh-methanol]", 1.0),
+    },
+     "FAME": {
+        "capex": ("Specific investment [M €/MW]", 1000.0),
+        "fopex": ("Fixed O&M [M €/MW/year]", 1000.0),
+        "vopex": ("Variable O&M [€/MWh]", 1.0),
     },
 }
 
@@ -420,6 +426,7 @@ _RF_RELATIVE_BOUNDS_TECHS = {
     "fischer_tropsch",
     "methanation",
     "biogas_methanation",
+    "FAME",
 }
 
 _RF_SCENARIOS_DEFAULT = {"min": "Lower", "max": "Upper", "ref": "ctrl"}
@@ -1469,6 +1476,46 @@ class DEA(Dataset[pd.DataFrame]):
             {
                 "heat": {
                     "default_value": 0.153 / methanol_mwh_per_ton,
+                    "unit": "GWh/GWh",
+                }
+            },
+        ]
+
+# TODO: add glycerine as a co-product to the FAME conversion factor, once it is modelled in the energy system.
+    def get_conversion_factor_FAME(self):
+        """returns the conversion factor for FAME biodiesel production.
+
+        Values from the DEA technology catalogue for renewable fuels (101 FAME
+        biodiesel (veg. oil), "Vegetable Oil FAME", 2020 values), per MWh of
+        total input: 0.926 MWh vegetable oil, 0.046 MWh methanol, 0.024 MWh
+        natural gas and 0.004 MWh electricity yield 0.903 MWh biodiesel and
+        0.039 MWh glycerine. The biodiesel is modelled as diesel and the
+        glycerine is not (yet) modelled. Normalized to the diesel reference carrier.
+        https://ens.dk/en/analyses-and-statistics/technology-data-renewable-fuels
+        """
+        biodiesel_output = 0.903  # MWh biodiesel / MWh total input
+        return [
+            {
+                "oily_biomass": {
+                    "default_value": 0.926 / biodiesel_output,
+                    "unit": "GWh/GWh",
+                }
+            },
+            {
+                "methanol": {
+                    "default_value": 0.046 / biodiesel_output,
+                    "unit": "GWh/GWh",
+                }
+            },
+            {
+                "natural_gas": {
+                    "default_value": 0.024 / biodiesel_output,
+                    "unit": "GWh/GWh",
+                }
+            },
+            {
+                "electricity": {
+                    "default_value": 0.004 / biodiesel_output,
                     "unit": "GWh/GWh",
                 }
             },

@@ -6,6 +6,7 @@ from zen_europe.elements.carriers.passenger_mileage import PassengerMileage
 from zen_europe.elements.conversion_technologies.BEV import BEV
 from zen_europe.elements.conversion_technologies.ICE_diesel import ICE_diesel
 from zen_europe.elements.conversion_technologies.ICE_petrol import ICE_petrol
+from zen_europe.elements.conversion_technologies.FAME import FAME
 
 
 class PassengerTransportSector(Sector):
@@ -23,4 +24,5 @@ class PassengerTransportSector(Sector):
             Gasoline,
             Diesel,
             PassengerMileage,
+            FAME,
         ]

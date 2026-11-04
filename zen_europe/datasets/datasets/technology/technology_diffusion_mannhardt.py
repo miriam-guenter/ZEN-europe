@@ -120,6 +120,7 @@ class TechnologyDiffusionMannhardt(Dataset[dict[str, pd.DataFrame]]):
         "oil_to_gasoline_conversion",
         "oil_to_diesel_conversion",
         "oil_to_kerosene_conversion",
+        "FAME",
     ]
     HIGH = [
         "photovoltaics",

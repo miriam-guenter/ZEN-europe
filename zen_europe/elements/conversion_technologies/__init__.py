@@ -18,6 +18,7 @@ from .EAF import EAF
 from .electrode_boiler import ElectrodeBoiler
 from .electrode_boiler_DH import ElectrodeBoilerDH
 from .electrolysis import Electrolysis
+from .FAME import FAME
 from .fischer_tropsch import FischerTropsch
 from .fuel_cell import FuelCell
 from .gasification import Gasification
@@ -134,4 +135,5 @@ __all__ = [
     "HDT_diesel",
     "HDT_BET",
     "HDT_FCEV",
+    "FAME",
 ]
