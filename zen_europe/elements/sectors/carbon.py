@@ -20,6 +20,10 @@ from zen_europe.elements.retrofitting_technologies.NG_DRI_CCS import NG_DRI_CCS
 from zen_europe.elements.retrofitting_technologies.SMR_CCS import SMR_CCS
 from zen_europe.elements.transport_technologies.carbon_pipeline import CarbonPipeline
 from zen_europe.elements.retrofitting_technologies.biogas_upgrading_CCS import BiogasUpgradingCCS
+from zen_europe.elements.retrofitting_technologies.ethanol_CCS import (
+    Ethanol1GStarchCCS,
+    EthanolCellulosicCCS,
+)
 
 class CarbonSector(Sector):
     """Carbon capture, transport and storage."""
@@ -42,4 +46,6 @@ class CarbonSector(Sector):
             MethanolFromHydrogen,
             Carbon,
             BiogasUpgradingCCS,
+            Ethanol1GStarchCCS,
+            EthanolCellulosicCCS,
         ]

@@ -18,6 +18,15 @@ from zen_europe.elements.conversion_technologies.pyrolysis_fast import FastPyrol
 from zen_europe.elements.conversion_technologies.pyrolysis_slow import SlowPyrolysis
 from zen_europe.elements.carriers.pyrolysis_oil import PyrolysisOil
 from zen_europe.elements.conversion_technologies.FAME import FAME
+from zen_europe.elements.carriers.ethanol import Ethanol
+from zen_europe.elements.conversion_technologies.ethanol_1G_starch import Ethanol1G
+from zen_europe.elements.conversion_technologies.ethanol_cellulosic import (
+    EthanolCellulosic,
+)
+from zen_europe.elements.retrofitting_technologies.ethanol_CCS import (
+    Ethanol1GStarchCCS,
+    EthanolCellulosicCCS,
+)
 
 
 class BiomassSector(Sector):
@@ -44,4 +53,9 @@ class BiomassSector(Sector):
             FastPyrolysis,
             SlowPyrolysis,
             FAME,
+            Ethanol,
+            Ethanol1G,
+            EthanolCellulosic,
+            Ethanol1GStarchCCS,
+            EthanolCellulosicCCS,
         ]

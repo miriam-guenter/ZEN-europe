@@ -6,6 +6,9 @@ from zen_europe.datasets.dataset_collections.technology_cost_database import (
     TechnologyCostDatabase,
 )
 from zen_europe.datasets.datasets.financial.dea import DEA
+from zen_europe.datasets.datasets.technology.IOGP_carbon_storage_projects import (
+    IOGPCarbonStorageProjects,
+)
 from zen_europe.datasets.datasets.technology.technology_diffusion_mannhardt import (
     TechnologyDiffusionMannhardt,
 )
@@ -209,3 +212,32 @@ class BiogasUpgradingCCS(RetrofittingTechnology):
             return self.max_diffusion_rate
         diffusion_rates = TechnologyDiffusionMannhardt(source_path=self.source_path)
         return diffusion_rates.get_max_diffusion_rate(self)
+
+    def _set_capacity_addition_unbounded(self) -> Attribute:
+        """
+        Sets the unbounded capacity addition of biogas upgrading CCS.
+
+        Capacity additions up to the size of a single reference project are
+        exempt from the diffusion limit, so that a first plant can be built
+        from a zero installed base.
+        """
+        attr = self.capacity_addition_unbounded
+        if not self.settings.investment.use_unbounded_capacity_addition_carbon:
+            return attr
+        iogp_projects = IOGPCarbonStorageProjects(
+            settings=self.settings, source_path=self.source_path
+        )
+        data = iogp_projects.get_capacity_existing_data()
+        median_add = data.median()
+        return attr.set_data(
+            default_value=median_add,
+            unit="tCO2/h",
+            source=SourceInformation(
+                description=(
+                    "The unbounded capacity addition of biogas upgrading CCS is based "
+                    "on the median existing and future capacity from the IOGP report, "
+                    "as for the other CCS retrofits."
+                ),
+                metadata=iogp_projects.metadata,
+            ),
+        )
