@@ -16,17 +16,27 @@ from zen_europe.datasets.datasets.financial._cost_schema import (
 
 # Techno-economic data from Concawe report 4/24, Table 116 (internal technology
 # name -> values). The capex and fixed O&M go back to Zimmermann et al. (2019), a
-# worked example for OME synthesis, so they are a proxy for methanol to kerosene.
+# worked example for OME synthesis, so they are a proxy for methanol to kerosene/gasoline.
 # Capex: Euro/kW of fuel (LHV), for 2020, 2030 and 2050.
 _CAPEX: dict[str, dict[int, float]] = {
     "methanol_to_kerosene": {2020: 307.0, 2030: 269.0, 2050: 200.0},
+    "methanol_to_gasoline": {2020: 307.0, 2030: 269.0, 2050: 200.0},
 }
 # Fixed O&M as a share of the capex per year.
-_FOPEX_SHARE_OF_CAPEX: dict[str, float] = {"methanol_to_kerosene": 0.045}
+_FOPEX_SHARE_OF_CAPEX: dict[str, float] = {
+    "methanol_to_kerosene": 0.045,
+    "methanol_to_gasoline": 0.045,
+}
 # Variable O&M: Euro/MWh of fuel (reported as 1350 Euro/GWh).
-_VOPEX: dict[str, float] = {"methanol_to_kerosene": 1.35}
+_VOPEX: dict[str, float] = {
+    "methanol_to_kerosene": 1.35,
+    "methanol_to_gasoline": 1.35,
+}
 # Lifetime in years.
-_LIFETIME: dict[str, float] = {"methanol_to_kerosene": 30.0}
+_LIFETIME: dict[str, float] = {
+    "methanol_to_kerosene": 30.0,
+    "methanol_to_gasoline": 30.0,
+}
 # The report gives costs "in today's purchasing power" without naming a year and
 # converts US$ at about 0.9 Euro/US$; 2020 is assumed.
 _MONEY_YEAR_SRC = 2020
@@ -128,4 +138,17 @@ class Concawe(Dataset[pd.DataFrame]):
             {"methanol": {"default_value": 1.0482, "unit": "GWh/GWh"}},
             {"hydrogen": {"default_value": 0.0240, "unit": "GWh/GWh"}},
             {"electricity": {"default_value": 0.0163, "unit": "GWh/GWh"}},
+        ]
+    
+    def get_conversion_factor_methanol_to_gasoline(self):
+        """returns the conversion factor for methanol to gasoline.
+
+        Values from Concawe report 4/24, Table 116, per MJ of gasoline (LHV). The
+        balance is allocated to the gasoline, so no co-products are reported.
+        The heat output (0.0300 MJ/MJ) is not modelled.
+        """
+        return [
+            {"methanol": {"default_value": 1.0562, "unit": "GWh/GWh"}},
+            {"hydrogen": {"default_value": 0.0036, "unit": "GWh/GWh"}},
+            {"electricity": {"default_value": 0.0164, "unit": "GWh/GWh"}},
         ]
