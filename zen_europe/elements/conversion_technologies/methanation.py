@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from zen_europe.datasets.dataset_collections.technology_cost_database import (
     TechnologyCostDatabase,
 )
-from zen_europe.datasets.datasets.technology.methanation_goetz import MethanationGoetz
+from zen_europe.datasets.datasets.technology.methanation_becker import MethanationBecker
 from zen_europe.datasets.datasets.technology.technology_diffusion_mannhardt import (
     TechnologyDiffusionMannhardt,
 )
@@ -68,19 +68,22 @@ class Methanation(ConversionTechnology):
         Return the conversion factor of methanation.
 
         """
-        goetz_dataset = MethanationGoetz(source_path=self.source_path)
-        return goetz_dataset.get_conversion_factor_methanation(element=self)
+        becker_dataset = MethanationBecker(source_path=self.source_path)
+        return becker_dataset.get_conversion_factor_methanation(element=self)
 
     def _set_construction_time(self) -> Attribute:
         """
         Sets the construction time of methanation.
+
+        LUW and EUREF report none, so the DEA value of the catalytic methanation
+        of biogas is used, which has the same reactor type.
 
         """
         if self.settings.investment.use_construction_times:
             tech_db = TechnologyCostDatabase(
                 settings=self.settings, source_path=self.source_path
             )
-            return tech_db.get_construction_time(self)
+            return tech_db.get_construction_time(self, proxy_element_name = "biogas_methanation")
         else:
             return self.construction_time
 

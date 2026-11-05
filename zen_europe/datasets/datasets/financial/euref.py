@@ -75,6 +75,21 @@ _COST_VARIABLE_SEGMENTS = {0: "capex", 1: "fopex", 2: "vopex"}
 _TECH_VARIABLE_SEGMENTS = {3: "efficiency", 5: "lifetime"}
 _MONEY_YEAR_SRC = 2020
 
+# Technologies from the "New Fuels" sheet: internal name -> (row label, multiplier
+# onto the model's cost basis). Methanation is reported per kW of CH4 HHV, while the
+# model uses LHV (55.5 / 50.0 MJ/kg).
+_NEW_FUELS_TECHS: dict[str, tuple[str, float]] = {
+    "methanation": ("Methanation  (per 1 kW or 1 MWh CH4 HHV)", 55.5 / 50.0),
+}
+# Column position -> year of the cost columns in the "New Fuels" sheet. The sheet's
+# "Ultimate" column is assumed to represent 2050.
+_NEW_FUELS_COST_COLUMNS: dict[str, dict[int, int]] = {
+    "capex": {1: 2020, 2: 2030, 3: 2050},
+    "fopex": {4: 2015, 5: 2030, 6: 2050},
+}
+# Note a) of the "New Fuels" sheet: all cost figures are in EUR'15.
+_NEW_FUELS_MONEY_YEAR_SRC = 2015
+
 
 def _lookup_euref_technology(technology: str, scenario: str) -> str | None:
     if (technology, scenario) in _TECHS:
@@ -239,6 +254,7 @@ class EUREF(Dataset[pd.DataFrame]):
                                 unit,
                             )
                         )
+        out_rows += self._parse_new_fuels()
         data = pd.DataFrame(out_rows, columns=INDEX_NAMES + VALUE_COLUMNS)
         data = data.drop_duplicates(subset=INDEX_NAMES)
         return data.set_index(INDEX_NAMES).sort_index()
@@ -248,6 +264,42 @@ class EUREF(Dataset[pd.DataFrame]):
     def get_costs(self) -> pd.DataFrame:
         """Return the parsed, standardized EUREF cost/tech data (see `_cost_schema`)."""
         return self.data.copy()
+
+    
+    def _parse_new_fuels(self) -> list[tuple[Any, ...]]:
+        """Parse the cost rows of the technologies on the "New Fuels" sheet.
+
+        The sheet has one row per technology and no scenario split, so its values
+        are reported as the reference scenario.
+        """
+        raw = pd.read_excel(
+            self.path / "REF2020_Technology Assumptions_Energy.xlsx",
+            sheet_name="New Fuels",
+            header=None,
+        )
+        rows: list[tuple[Any, ...]] = []
+        for technology, (label, multiplier) in _NEW_FUELS_TECHS.items():
+            row = raw[raw[0] == label]
+            if row.empty:
+                raise ValueError(f"EUREF 'New Fuels' has no row '{label}'.")
+            for variable, columns in _NEW_FUELS_COST_COLUMNS.items():
+                for column, year in columns.items():
+                    value_src = float(row.iloc[0, column])
+                    rows.append(
+                        (
+                            technology,
+                            "M",
+                            "ref",
+                            variable,
+                            year,
+                            value_src * multiplier,
+                            "Euro/kW",
+                            _NEW_FUELS_MONEY_YEAR_SRC,
+                            value_src,
+                            "EUR/kW CH4 HHV",
+                        )
+                    )
+        return rows
 
 
 def _convert_unit(unit_src: str, variable: str) -> float:

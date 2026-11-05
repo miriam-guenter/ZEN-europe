@@ -295,7 +295,6 @@ _RF_TECHS: dict[str, str] = {
     # large-scale, straw-feedstock variant, the closest continuation of the old entry.
     "pyrolysis_slow": "Large scale slow pyrolysis (20 MW) - Straw feedstock",
     "pyrolysis_fast": "Fast pyrolysis (25 MW) - Wood feedstock",
-    "methanation": "SNG from Biogas", # change this (get technology data from other source)
     "biogas_methanation": "SNG from Biogas",
     "gasification": "Gasifier, biomass, bio-SNG, medium - large scale",
     "electrolysis": "Hydrogen production via PEMEC electrolysis for 100 MW plant",
@@ -345,11 +344,6 @@ _RF_COST_PARS: dict[str, dict[str, tuple[str, float]]] = {
             "Fixed and variable O&M [M€/MW output from pyrolysis process/year]",
             1000.0,
         ),
-    },
-    "methanation": {
-        "capex": ("Specific investment [M€/MW SNG]", 1000.0),
-        "fopex": ("Fixed O&M [M€/MW/year SNG]", 1000.0),
-        "vopex": ("Variable O&M [€/MWh SNG]", 1.0),
     },
     "biogas_methanation": {
         "capex": ("Specific investment [M€/MW SNG]", 1000.0),
@@ -450,7 +444,6 @@ _RF_RELATIVE_BOUNDS_TECHS = {
     "methanol_from_hydrogen",
     "methanol_from_biogas",
     "fischer_tropsch",
-    "methanation",
     "biogas_methanation",
     "FAME",
     "ethanol_1G_starch",
