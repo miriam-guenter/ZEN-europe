@@ -1411,13 +1411,33 @@ class DEA(Dataset[pd.DataFrame]):
 
         Values from the DEA technology catalogue for renewable fuels (Green
         Ammonia plant: Hydrogen to ammonia, excl. electrolyzer and excl.
-        air-separation unit).
+        air-separation unit), normalized to the ammonia reference carrier.
+        The electricity of the air separation unit (ASU) is added: 250 kWh/t N2
+        at 0.839 t N2/t ammonia and 18.9 GJ/t ammonia. 
         https://ens.dk/en/analyses-and-statistics/technology-data-renewable-fuels
         """
+        ammonia_output = 82.3  # MWh ammonia per 100 MWh total input
+        asu_mwh_per_ton_n2 = 0.25  # MWh N2 per ton N2
+        n2_ton_per_ton_ammonia = 0.839  # ton N2 per ton ammonia
+        ammonia_mwh_per_ton = 18.9 / Constants.GJ_PER_MWH 
+        asu_electricity = (asu_mwh_per_ton_n2 * n2_ton_per_ton_ammonia) / ammonia_mwh_per_ton
         return [
-            {"hydrogen": {"default_value": 0.95, "unit": "GWh/GWh"}},
-            {"electricity": {"default_value": 0.05, "unit": "GWh/GWh"}},
+            {"hydrogen": {"default_value": 94.7 / ammonia_output, "unit": "GWh/GWh"}},
+            {"electricity": {"default_value": 5.3 / ammonia_output + asu_electricity, "unit": "GWh/GWh"}},
         ]
+
+    def get_cost_multiplier_haber_bosch_ASU(self) -> float:
+        """returns the cost multiplier for including the air separation unit (ASU)
+        in the Haber-Bosch plant.
+
+        The DEA technology catalogue for renewable fuels (98 Ammonia from Hydrogen
+        and Air Capture) reports the costs without an ASU and gives a mark-up of
+        1.06-1.09 on the specific investment; its data sheet uses 1.09 as the
+        central value. Fixed O&M is 3% of the investment, so it scales with the
+        same factor. Variable O&M only covers the synthesis catalyst and
+        consumables, so it does not.
+        """
+        return 1.09
 
     def get_conversion_factor_methanol_from_hydrogen(self):
         """returns the conversion factor for methanol from hydrogen.

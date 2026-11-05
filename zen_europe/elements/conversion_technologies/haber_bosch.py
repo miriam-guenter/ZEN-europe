@@ -76,7 +76,9 @@ class HaberBosch(ConversionTechnology):
                 "manually derived value based on the DEA technology "
                 "catalogue for renewable fuels (Green Ammonia plant: "
                 "Hydrogen to ammonia, excl. electrolyzer and excl. air-"
-                "separation unit)."
+                "separation unit), normalized to the ammonia output. It "
+                "includes the electricity demand of an air separation unit "
+                "(250 kWh/t N2)."
             ),
             metadata=dea_dataset.metadata,
         )
@@ -101,18 +103,25 @@ class HaberBosch(ConversionTechnology):
         Sets the specific capital expenditure (capex) for the Haber-Bosch
         process.
 
+        DEA reports the investment without an air separation unit (ASU), so 
+        its mark-up factor is applied.
+
         Returns:
             Attribute: An Attribute object containing the specific capex data.
         """
         tech_db = TechnologyCostDatabase(
             settings=self.settings, source_path=self.source_path
         )
-        return tech_db.get_capex_specific_conversion(self)
+        muliplier = DEA(source_path=self.source_path).get_cost_multiplier_haber_bosch_ASU()
+        return tech_db.get_capex_specific_conversion(self, multiplier=muliplier)
 
     def _set_opex_specific_fixed(self) -> Attribute:
         """
         Sets the specific fixed operational expenditure (opex) for the
         Haber-Bosch process.
+
+        DEA takes the fixed O&M as 3% of the investment, so the same air
+        separation unit mark-up factor is applied.
 
         Returns:
             Attribute: An Attribute object containing the specific fixed opex data.
@@ -120,7 +129,8 @@ class HaberBosch(ConversionTechnology):
         tech_db = TechnologyCostDatabase(
             settings=self.settings, source_path=self.source_path
         )
-        return tech_db.get_opex_specific_fixed(self)
+        multiplier = DEA(source_path=self.source_path).get_cost_multiplier_haber_bosch_ASU()
+        return tech_db.get_opex_specific_fixed(self, multiplier=multiplier)
 
     def _set_opex_specific_variable(self) -> Attribute:
         """
