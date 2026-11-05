@@ -127,6 +127,7 @@ class TechnologyDiffusionMannhardt(Dataset[dict[str, pd.DataFrame]]):
         "ethanol_cellulosic_CCS",
         "HVO_diesel",
         "HVO_jet",
+        "methanol_to_kerosene",
     ]
     HIGH = [
         "photovoltaics",

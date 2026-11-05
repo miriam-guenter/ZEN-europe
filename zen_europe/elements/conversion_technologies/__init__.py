@@ -47,6 +47,7 @@ from .methanol_from_biomass import MethanolFromBiomass
 from .methanol_from_hydrogen import MethanolFromHydrogen
 from .methanol_from_natural_gas import MethanolFromNaturalGas
 from .methanol_ICE_ship import MethanolICEShip
+from .methanol_to_kerosene import MethanolToKerosene
 from .natural_gas_boiler import NaturalGasBoiler
 from .natural_gas_boiler_DH import NaturalGasBoilerDH
 from .natural_gas_turbine import NaturalGasTurbine
@@ -116,6 +117,7 @@ __all__ = [
     "MethanolFromBiogas",
     "MethanolFromBiomass",
     "MethanolFromHydrogen",
+    "MethanolToKerosene",
     "OlefinFromMethanol",
     "OlefinFromNaphtha",
     "HaberBosch",

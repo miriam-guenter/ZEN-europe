@@ -29,6 +29,7 @@ from zen_europe.elements.transport_technologies.methanol_pipeline import (
 from zen_europe.elements.transport_technologies.olefin_pipeline import OlefinPipeline
 
 from zen_europe.elements.conversion_technologies.FAME import FAME
+from zen_europe.elements.conversion_technologies.methanol_to_kerosene import MethanolToKerosene
 
 
 class MethanolSector(Sector):
@@ -59,4 +60,5 @@ class MethanolSector(Sector):
             Methanol,
             Olefin,
             FAME,
+            MethanolToKerosene,
         ]

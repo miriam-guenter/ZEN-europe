@@ -5,6 +5,7 @@ from zen_europe.elements.conversion_technologies.oil_to_kerosene_conversion impo
     OilToKeroseneConversion,
 )
 from zen_europe.elements.conversion_technologies.HVO_jet import HVOJet
+from zen_europe.elements.conversion_technologies.methanol_to_kerosene import MethanolToKerosene
 
 class AviationSector(Sector):
     """Aviation fuel demand."""
@@ -18,4 +19,5 @@ class AviationSector(Sector):
             OilToKeroseneConversion,
             Kerosene,
             HVOJet,
+            MethanolToKerosene,
         ]
