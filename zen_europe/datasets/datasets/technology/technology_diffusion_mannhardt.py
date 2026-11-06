@@ -112,6 +112,7 @@ class TechnologyDiffusionMannhardt(Dataset[dict[str, pd.DataFrame]]):
         "methanol_from_biogas",
         "methanol_from_biomass",
         "fischer_tropsch",
+        "fischer_tropsch_biomass",
         "DAC",
         "pyrolysis_slow",
         "pyrolysis_fast",

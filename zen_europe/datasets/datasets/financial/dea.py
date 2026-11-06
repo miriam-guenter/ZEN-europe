@@ -290,6 +290,7 @@ _RF_TECHS: dict[str, str] = {
         "Green Ammonia plant: Hydrogen to ammonia (excl. electrolyzer and excl. ASU)"
     ),
     "fischer_tropsch": "Hydrogen to Jet Fuel",
+    "fischer_tropsch_biomass": "Gasifier, biomass, Fischer Tropsch liquid fuels, large scale",
     # DEA reorganized its old single "Slow pyrolysis ... from straw" entry into scale x
     # feedstock variants (large/small scale x straw/garden waste/digestate); we use the
     # large-scale, straw-feedstock variant, the closest continuation of the old entry.
@@ -326,6 +327,11 @@ _RF_COST_PARS: dict[str, dict[str, tuple[str, float]]] = {
     "fischer_tropsch": {
         "capex": ("Specific investment [M€/MW Liquids/year]", 1000.0),
         "vopex": ("Variable O&M [€/MWH Liquids]", 1.0),
+    },
+    "fischer_tropsch_biomass": {
+        "capex": ("Specific investment [M€/MW Liquids/year]", 1000.0),
+        "fopex": ("Fixed O&M [M€/MW/year FT Liquids/year]", 1000.0),
+        "vopex": ("Variable O&M [€/MWh FT Liquids/year]", 1.0),
     },
     # DEA's reorganized pyrolysis chapter merged fixed and variable O&M into a single
     # per-MW/year figure (previously reported separately); mapped to fopex only, vopex
@@ -444,6 +450,7 @@ _RF_RELATIVE_BOUNDS_TECHS = {
     "methanol_from_hydrogen",
     "methanol_from_biogas",
     "fischer_tropsch",
+    "fischer_tropsch_biomass",
     "biogas_methanation",
     "FAME",
     "ethanol_1G_starch",
@@ -1338,6 +1345,21 @@ class DEA(Dataset[pd.DataFrame]):
                     "unit": "GWh/GWh",
                 }
             },
+        ]
+
+    def get_conversion_factor_fischer_tropsch_biomass(self):
+        """returns the conversion factor for biomass Fischer-Tropsch.
+
+        Values from the DEA technology catalogue for renewable fuels (99 Jet fuel
+        from biomass gasification, 2020 values), per MWh of biomass: 0.1376 MWh
+        naphtha, 0.147 MWh jet fuel, 0.0998 MWh diesel and 0.0117 MWh electricity.
+        The liquids are pooled in the oil reference carrier.
+        https://ens.dk/en/analyses-and-statistics/technology-data-renewable-fuels
+        """
+        liquids_output = 0.1376 + 0.147 + 0.0998  # MWh liquids / MWh biomass
+        return [
+            {"gasif_biomass": {"default_value": 1 / liquids_output, "unit": "GWh/GWh"}},
+            {"electricity": {"default_value": 0.0117 / liquids_output, "unit": "GWh/GWh"}},
         ]
 
     def get_conversion_factor_pyrolysis_slow(self):

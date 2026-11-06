@@ -23,6 +23,7 @@ from .ethanol_cellulosic import EthanolCellulosic
 from .ethanol_to_gasoline import EthanolToGasoline
 from .FAME import FAME
 from .fischer_tropsch import FischerTropsch
+from .fischer_tropsch_biomass import FischerTropschBiomass
 from .fuel_cell import FuelCell
 from .gasification import Gasification
 from .H2_DRI import H2_DRI
@@ -107,6 +108,7 @@ __all__ = [
     "Electrolysis",
     "Gasification",
     "FischerTropsch",
+    "FischerTropschBiomass",
     "Methanation",
     "AnaerobicDigestion",
     "BiogasUpgrading",

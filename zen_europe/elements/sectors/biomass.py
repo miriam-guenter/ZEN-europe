@@ -30,6 +30,7 @@ from zen_europe.elements.retrofitting_technologies.ethanol_CCS import (
 from zen_europe.elements.conversion_technologies.ethanol_to_gasoline import EthanolToGasoline
 from zen_europe.elements.conversion_technologies.HVO_diesel import HVODiesel
 from zen_europe.elements.conversion_technologies.HVO_jet import HVOJet
+from zen_europe.elements.conversion_technologies.fischer_tropsch_biomass import FischerTropschBiomass
 
 class BiomassSector(Sector):
     """Biomass supply: primary feedstocks with ENSPRESO potentials, the pooled
@@ -63,4 +64,5 @@ class BiomassSector(Sector):
             EthanolToGasoline,
             HVODiesel,
             HVOJet,
+            FischerTropschBiomass,
         ]
