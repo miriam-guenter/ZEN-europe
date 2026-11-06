@@ -5,6 +5,9 @@ from zen_europe.elements.conversion_technologies.electrolysis import Electrolysi
 from zen_europe.elements.conversion_technologies.fischer_tropsch import FischerTropsch
 from zen_europe.elements.conversion_technologies.fuel_cell import FuelCell
 from zen_europe.elements.conversion_technologies.gasification import Gasification
+from zen_europe.elements.conversion_technologies.gasification_to_hydrogen import (
+    GasificationToHydrogen,
+)
 from zen_europe.elements.conversion_technologies.H2_DRI import H2_DRI
 from zen_europe.elements.conversion_technologies.HDT_FCEV import HDT_FCEV
 from zen_europe.elements.conversion_technologies.hydrogen_FC_ship import (
@@ -13,6 +16,9 @@ from zen_europe.elements.conversion_technologies.hydrogen_FC_ship import (
 from zen_europe.elements.conversion_technologies.biogas_methanation import BiogasMethanation
 from zen_europe.elements.conversion_technologies.methanation import Methanation
 from zen_europe.elements.conversion_technologies.SMR import SMR
+from zen_europe.elements.retrofitting_technologies.gasification_to_hydrogen_CCS import (
+    GasificationToHydrogenCCS,
+)
 from zen_europe.elements.retrofitting_technologies.hydrogen_to_cement_fuel import (
     HydrogenToCementFuel,
 )
@@ -38,11 +44,13 @@ class HydrogenSector(Sector):
             FuelCell,
             SMR,
             Gasification,
+            GasificationToHydrogen,
             FischerTropsch,
             Methanation,
             HydrogenPipeline,
             SaltCavernStorage,
             SMR_CCS,
+            GasificationToHydrogenCCS,
             HDT_FCEV,
             HydrogenToCementFuel,
             HydrogenFCShip,

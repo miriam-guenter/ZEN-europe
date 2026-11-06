@@ -54,6 +54,9 @@ from zen_europe.datasets.datasets.technology.storage_technologies_victoria impor
     StorageTechnologiesVictoria,
 )
 from zen_europe.datasets.datasets.technology.concawe_fuels import Concawe
+from zen_europe.datasets.datasets.technology.rollout_hydrogen_ganter import (
+    HydrogenRolloutGanter,
+)
 
 _AGENCY_DATASETS: dict[str, Callable[..., Dataset[Any]]] = {
     "dea": DEA,
@@ -65,6 +68,7 @@ _AGENCY_DATASETS: dict[str, Callable[..., Dataset[Any]]] = {
     "schmidt": StorageTechnologiesSchmidt,
     "victoria": StorageTechnologiesVictoria,
     "concawe": Concawe,
+    "ganter": HydrogenRolloutGanter,
 }
 _METRICS = ("mean", "median", "min", "max")
 

@@ -81,6 +81,8 @@ class TechnologyDiffusionMannhardt(Dataset[dict[str, pd.DataFrame]]):
         "fuel_cell",
         "gasification",
         "gasification_CCS",
+        "gasification_to_hydrogen",
+        "gasification_to_hydrogen_CCS",
         "SMR",
         "SMR_CCS",
         "biogas_upgrading",

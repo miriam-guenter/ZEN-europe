@@ -25,6 +25,10 @@ from zen_europe.elements.retrofitting_technologies.ethanol_CCS import (
     EthanolCellulosicCCS,
 )
 
+from zen_europe.elements.retrofitting_technologies.gasification_to_hydrogen_CCS import (
+    GasificationToHydrogenCCS,
+)
+
 class CarbonSector(Sector):
     """Carbon capture, transport and storage."""
 
@@ -48,4 +52,5 @@ class CarbonSector(Sector):
             BiogasUpgradingCCS,
             Ethanol1GStarchCCS,
             EthanolCellulosicCCS,
+            GasificationToHydrogenCCS,
         ]

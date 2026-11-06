@@ -26,6 +26,7 @@ from .fischer_tropsch import FischerTropsch
 from .fischer_tropsch_biomass import FischerTropschBiomass
 from .fuel_cell import FuelCell
 from .gasification import Gasification
+from .gasification_to_hydrogen import GasificationToHydrogen
 from .H2_DRI import H2_DRI
 from .haber_bosch import HaberBosch
 from .hard_coal_boiler_DH import HardCoalBoilerDH
@@ -107,6 +108,7 @@ __all__ = [
     "SMR",
     "Electrolysis",
     "Gasification",
+    "GasificationToHydrogen",
     "FischerTropsch",
     "FischerTropschBiomass",
     "Methanation",
