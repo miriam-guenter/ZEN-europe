@@ -66,6 +66,8 @@ class TechnologyDiffusionMannhardt(Dataset[dict[str, pd.DataFrame]]):
         "biomass_plant",
         "biomass_plant_CCS",
         "biomass_CHP",
+        "biogas_CHP",
+        "biogas_CHP_CCS",
         "oil_plant",
         "waste_plant",
         "lng_terminal",

@@ -8,6 +8,7 @@ from zen_europe.datasets.dataset_collections.technology_cost_database import (
 from zen_europe.datasets.datasets.technology.technology_diffusion_mannhardt import (
     TechnologyDiffusionMannhardt,
 )
+from zen_europe.datasets.datasets.financial.potencia import Potencia
 
 if TYPE_CHECKING:
     from zen_creator.model import Model
@@ -174,7 +175,21 @@ class BiomassCHP(ConversionTechnology):
             ),
         )
         return attr
+ 
+    def _set_max_load(self) -> Attribute:
+        """
+        Sets the maximum load of biomass CHP plants.
 
+        Technical availability of biomass steam turbine CHP plants from
+        Potencia.
+        """
+        potencia_db = Potencia(source_path=self.source_path)
+        return potencia_db.get_max_load_CHP(
+            self,
+            potencia_type="Biomass and waste fired power plants",
+            potencia_technology="Steam turbine",
+        )
+    
     def _set_max_diffusion_rate(self) -> Attribute:
         """
         Sets the maximum diffusion rate of biomass CHP plants.

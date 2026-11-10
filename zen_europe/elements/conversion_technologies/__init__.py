@@ -7,6 +7,7 @@ from .biomass_boiler import BiomassBoiler
 from .biomass_boiler_DH import BiomassBoilerDH
 from .biomass_CHP import BiomassCHP
 from .biomass_plant import BiomassPlant
+from .biogas_CHP import BiogasCHP
 from .biogas_methanation import BiogasMethanation
 from .biogas_upgrading import BiogasUpgrading
 from .carbon_storage import CarbonStorage
@@ -90,6 +91,7 @@ __all__ = [
     "BIOMASS_ROUTE_TECHNOLOGIES",
     "BiomassCHP",
     "BiomassPlant",
+    "BiogasCHP",
     "WastePlant",
     "NaturalGasBoiler",
     "HeatPump",

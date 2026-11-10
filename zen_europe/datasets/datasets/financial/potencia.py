@@ -319,8 +319,7 @@ class Potencia(Dataset[pd.DataFrame]):
                 header_idx[pos + 1] - 1 if pos + 1 < len(header_idx) else raw.index[-1],
             )
             block = raw.loc[start + 2 : end].copy()
-            block = block.rename(
-                columns={
+            block = block.rename(columns={
                     "Unnamed: 5": "Type",
                     "Unnamed: 6": "Technology",
                     "Unnamed: 7": "Co-generation",
@@ -394,6 +393,41 @@ class Potencia(Dataset[pd.DataFrame]):
         )
         attr.set_data(
             default_value=unique_availability[0],
+            source=source,
+        )
+        return attr
+ 
+    def get_max_load_CHP(
+        self, element: Technology, potencia_type: str, potencia_technology: str
+    ) -> Attribute:
+        """Return the technical availability of a CHP technology.
+
+        Read directly from `tech_base` for the given Potencia type and
+        technology in co-generation mode, so that the CHP row is used and the
+        technology does not need an entry in `_TECHS` (which would also add its
+        Potencia costs and efficiency to the technology cost database).
+        """
+        _, _, availability = self._read_tech_base()
+        availability = availability.xs(
+            (potencia_type, potencia_technology, "CHP"),
+            level=["Type", "Technology", "Co-generation"],
+        )
+        unique_availability = availability.unique()
+        if len(unique_availability) > 1:
+            logging.warning(
+                f"Multiple availability values found for {element.name}: "
+                f"{unique_availability}. Using the first one."
+            )
+        attr = element.max_load
+        source = SourceInformation(
+            description=(
+                "The maximum load (technical availability) is derived from the "
+                f"Potencia dataset ({potencia_type}, {potencia_technology}, CHP)."
+            ),
+            metadata=self.metadata,
+        )
+        attr.set_data(
+            default_value=float(unique_availability[0]),
             source=source,
         )
         return attr

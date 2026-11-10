@@ -196,3 +196,49 @@ class CCSConversionFactor(DatasetCollection):
                 metadata=self.metadata,
             ),
         )
+
+
+    def get_retrofit_flow_coupling_factor_biogas_CHP_CCS(
+        self, element: RetrofittingTechnology, base_tech: ConversionTechnology
+    ) -> Attribute:
+        """
+        Get the retrofit flow coupling factor for biogas CHP CCS [tCO2/MWh_el].
+
+        The flue gas of a biogas engine contains the CO2 from burning the
+        methane and the CO2 that was already in the raw biogas. The captured
+        CO2 per unit of electricity is therefore
+        (combustion CO2 + contained CO2) * capture rate * biogas input.
+        """
+        dea = cast(DEA, self.data["dea"])
+        ipcc_emission_factors = cast(
+            IPCCEmissionFactors, self.data["ipcc_emission_factors"]
+        )
+        conversion_factors = cast(
+            list[dict[str, dict[str, float]]], base_tech.conversion_factor.default_value
+        )
+        biogas_input = next(
+            entry["biogas"]["default_value"]
+            for entry in conversion_factors
+            if "biogas" in entry
+        )
+        co2_combustion = float(ipcc_emission_factors.data["biogas"])
+        co2_contained = dea.get_co2_content_biogas()
+        capture_rate = dea.get_capture_rate_CCS()
+        carbon_removal_factor = (
+            (co2_combustion + co2_contained) * capture_rate * biogas_input
+        )
+        attr = element.retrofit_flow_coupling_factor
+        return attr.set_data(
+            default_value=carbon_removal_factor,
+            unit="tCO2/MWh",
+            source=SourceInformation(
+                description=(
+                    "The retrofit flow coupling factor of biogas CHP CCS is the CO2 "
+                    "in the engine flue gas per unit of electricity, times the "
+                    "capture rate: the combustion CO2 of biogas (IPCC) plus the CO2 "
+                    "already contained in raw biogas (DEA), multiplied by the "
+                    "engine's biogas input per unit of electricity."
+                ),
+                metadata=self.metadata,
+            ),
+        )

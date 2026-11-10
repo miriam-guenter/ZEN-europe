@@ -1,0 +1,191 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from zen_europe.datasets.dataset_collections.technology_cost_database import (
+    TechnologyCostDatabase,
+)
+from zen_europe.datasets.datasets.financial.dea import DEA
+from zen_europe.datasets.datasets.financial.potencia import Potencia
+from zen_europe.datasets.datasets.technology.powerplantmatching import (
+    PowerPlantMatching,
+)
+from zen_europe.datasets.datasets.technology.technology_diffusion_mannhardt import (
+    TechnologyDiffusionMannhardt,
+)
+
+if TYPE_CHECKING:
+    from zen_creator.model import Model
+
+from zen_creator import (
+    AssumptionInformation,
+    Attribute,
+    ConversionTechnology,
+    SourceInformation,
+)
+
+
+class BiogasCHP(ConversionTechnology):
+    """Class containing all data and assumptions for biogas gas engines (back
+    pressure CHP, small) that burn raw biogas and supply electricity and
+    district heat."""
+
+    name: str = "biogas_CHP"
+
+    def __init__(self, model: Model, power_unit: str = "MW"):
+        super().__init__(model=model, power_unit=power_unit)
+
+    # ---------- Required methods that are called during object construction ----------
+
+    def _set_reference_carrier(self) -> Attribute:
+        """
+        Sets the reference carrier of biogas CHP engines to electricity, since
+        DEA reports their costs per MW of electrical capacity.
+        """
+        return Attribute(
+            name="reference_carrier", default_value=["electricity"], element=self
+        )
+
+    def _set_input_carrier(self) -> Attribute:
+        """
+        Sets the input carrier of biogas CHP engines to raw biogas.
+        """
+        return Attribute(name="input_carrier", default_value=["biogas"], element=self)
+
+    def _set_output_carrier(self) -> Attribute:
+        """
+        Set the output carrier of biogas CHP engines to electricity and
+        district heat.
+        """
+        return Attribute(
+            name="output_carrier",
+            default_value=["electricity", "district_heat"],
+            element=self,
+        )
+
+    # ---------- Required methods that are called during object build ----------
+
+    def _set_lifetime(self) -> Attribute:
+        """
+        Sets the lifetime of biogas CHP engines.
+        """
+        tech_db = TechnologyCostDatabase(
+            settings=self.settings, source_path=self.source_path
+        )
+        return tech_db.get_lifetime(self)
+
+    def _set_conversion_factor(self) -> Attribute:
+        """
+        Return the conversion factor of biogas CHP engines.
+
+        Both factors are expressed per unit of electricity output: the biogas
+        input is 1 / electrical efficiency, and the district heat output is
+        1 / Cb (DEA's power-to-heat ratio).
+        """
+        attr = self.conversion_factor
+        tech_db = TechnologyCostDatabase(
+            settings=self.settings, source_path=self.source_path
+        )
+        dea = DEA(source_path=self.source_path)
+        reference_year = self.settings.time.reference_year
+        eff_el, agencies = tech_db.get_efficiency(self)
+        eff_el = eff_el.loc[reference_year]
+        cb = dea.get_cb_coefficient_biogas_CHP(year=reference_year)
+        cf = [
+            {"biogas": {"default_value": 1 / eff_el, "unit": "GWh/GWh"}},
+            {"district_heat": {"default_value": 1 / cb, "unit": "GWh/GWh"}},
+        ]
+        source = SourceInformation(
+            description=(
+                "The conversion factor of biogas CHP engines is based on the "
+                f"electrical efficiency (net, name plate) from {', '.join(agencies)} "
+                "and DEA's Cb coefficient (power-to-heat ratio at district heating "
+                "temperatures), normalized to the electricity output."
+            ),
+            metadata=tech_db.metadata,
+        )
+        attr.set_data(default_value=cf, source=source)
+        return attr
+
+    def _set_construction_time(self) -> Attribute:
+        """
+        Sets the construction time of biogas CHP engines.
+        """
+        if self.settings.investment.use_construction_times:
+            tech_db = TechnologyCostDatabase(
+                settings=self.settings, source_path=self.source_path
+            )
+            return tech_db.get_construction_time(self)
+        else:
+            return self.construction_time
+
+    def _set_capex_specific_conversion(self) -> Attribute:
+        """
+        Sets the specific capital expenditure (capex) for biogas CHP engines.
+        """
+        tech_db = TechnologyCostDatabase(
+            settings=self.settings, source_path=self.source_path
+        )
+        return tech_db.get_capex_specific_conversion(self)
+
+    def _set_opex_specific_fixed(self) -> Attribute:
+        """
+        Sets the specific fixed operational expenditure (opex) for biogas CHP
+        engines.
+        """
+        tech_db = TechnologyCostDatabase(
+            settings=self.settings, source_path=self.source_path
+        )
+        return tech_db.get_opex_specific_fixed(self)
+
+    def _set_opex_specific_variable(self) -> Attribute:
+        """
+        Sets the specific variable operational expenditure (opex) for biogas
+        CHP engines.
+        """
+        tech_db = TechnologyCostDatabase(
+            settings=self.settings, source_path=self.source_path
+        )
+        return tech_db.get_opex_specific_variable(self)
+
+    def _set_capacity_existing(self) -> Attribute:
+        """
+        Sets the existing capacity of biogas CHP engines from the biogas plants
+        in PowerPlantMatching.
+        """
+        if self.settings.investment.use_existing_capacities:
+            powerplantmatching = PowerPlantMatching(source_path=self.source_path)
+            return powerplantmatching.get_capacity_existing(self)
+        else:
+            attr = self.capacity_existing
+            attr.set_data(
+                default_value=0,
+                df=None,
+                source=AssumptionInformation(
+                    description=("We do not consider existing capacities."),
+                ),
+            )
+            return attr
+
+    def _set_max_load(self) -> Attribute:
+        """
+        Sets the maximum load of biogas CHP engines.
+
+        Technical availability of internal combustion engine CHP plants (gas
+        fired, natural gas and biogas) from Potencia.
+        """
+        potencia_db = Potencia(source_path=self.source_path)
+        return potencia_db.get_max_load_CHP(
+            self,
+            potencia_type="Gas fired power plants (Natural gas, biogas)",
+            potencia_technology="Internal combustion engine",
+        )
+
+    def _set_max_diffusion_rate(self) -> Attribute:
+        """
+        Sets the maximum diffusion rate of biogas CHP engines.
+        """
+        if not self.settings.investment.use_diffusion_rates:
+            return self.max_diffusion_rate
+        diffusion_rates = TechnologyDiffusionMannhardt(source_path=self.source_path)
+        return diffusion_rates.get_max_diffusion_rate(self)

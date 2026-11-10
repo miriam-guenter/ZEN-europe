@@ -47,7 +47,8 @@ class PowerPlantMatching(Dataset[pd.DataFrame]):
         "waste_plant": {
             "Fueltype": ["Waste"],
         },
-        "biomass_plant": {"Fueltype": ["Solid Biomass", "Biogas"]},
+        "biomass_plant": {"Fueltype": ["Solid Biomass"]},
+        "biogas_CHP": {"Fueltype": ["Biogas"]},
         "run-of-river_hydro": {"Fueltype": ["Hydro"], "Technology": ["Run-Of-River"]},
         "reservoir_hydro": {"Fueltype": ["Hydro"], "Technology": ["Reservoir"]},
         "pumped_hydro": {"Fueltype": ["Hydro"], "Technology": ["Pumped Storage"]},
@@ -153,16 +154,27 @@ class PowerPlantMatching(Dataset[pd.DataFrame]):
         return data
 
     # -------- methods ------------------------
-    def get_capacity_existing(self, element: Technology) -> Attribute:
+    def get_capacity_existing(
+        self,
+        element: Technology,
+        technology: str | None = None,
+        scaling_factor: float = 1.0,
+    ) -> Attribute:
         """
         Get the existing capacity for a technology.
 
         Args:
             element: The element for which to get the existing capacity.
+            technology: The PowerPlantMatching technology to read. Defaults to
+                the element's own name; set it to derive the capacity of a
+                coupled technology (e.g. the digesters feeding biogas plants).
+            scaling_factor: Factor applied to the capacity, e.g. to convert an
+                electrical capacity into the fuel flow it requires.
 
         Returns:
             Attribute: The existing capacity attribute of the element.
         """
+        technology = technology or element.name
         data_raw = self.data.copy()
         data_raw = data_raw[
             data_raw["DateOut"].isna()
@@ -170,21 +182,23 @@ class PowerPlantMatching(Dataset[pd.DataFrame]):
         ]
         data = data_raw.groupby(["technology", "node", "year"])["Capacity"].sum()
         data = data.sort_index() / 1000  # convert MW to GW
-        assert element.name in data.index.get_level_values(0), (
-            f"Existing capacity data for {element.name} is not available in the "
+        assert technology in data.index.get_level_values(0), (
+            f"Existing capacity data for {technology} is not available in the "
             "PowerPlantMatching dataset."
         )
-        data = data.loc[element.name]
+        data = data.loc[technology] * scaling_factor
         reference_year = element.settings.time.reference_year
         data = data[data.index.get_level_values("year") < reference_year]
         data = format_capacity_existing(data)
-        source = SourceInformation(
-            description=(
-                "The existing capacity data is derived from the PowerPlantMatching "
-                "dataset."
-            ),
-            metadata=self.metadata,
+        description = (
+            "The existing capacity data is derived from the PowerPlantMatching dataset."
         )
+        if technology != element.name or scaling_factor != 1.0:
+            description += (
+                f" It is the capacity of the PowerPlantMatching technology "
+                f"'{technology}', multiplied by {scaling_factor:.4g}."
+            )
+        source = SourceInformation(description=description, metadata=self.metadata)
         attr = element.capacity_existing.set_data(df=data, source=source, unit="GW")
         return attr
 

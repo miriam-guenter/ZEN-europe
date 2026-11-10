@@ -71,6 +71,7 @@ _MAIN_TECHS: dict[str, tuple[str, str, str, str | None]] = {
     "biomass_CHP": ("Biomass CHP", "back pressure", "wood chips", "medium"),
     "electrode_boiler_DH": ("Electric boiler", "boiler", "electricity", None),
     "fuel_cell": ("Low temp PEM fuel cell", "back pressure", "hydrogen", "small"),
+    "biogas_CHP": ("Engine", "back pressure", "biogas", "small"),
 }
 
 # DEA reports rooftop-residential/rooftop-commercial/utility-scale PV as three separate
@@ -161,6 +162,9 @@ _CCS_TECHS: dict[str, str] = {
         "Post-combustion carbon capture retrofit - 100 MW(th) WtE or biomass CHP plant"
     ),
     "biogas_upgrading_CCS": "Liquefaction for biogas plant retrofit",
+    "biogas_CHP_CCS": (
+        "Post-combustion carbon capture retrofit - 100 MW(th) WtE or biomass CHP plant"
+    ),
 }
 # DAC has no reported variable O&M figure.
 _CCS_COST_PARS: dict[str, dict[str, str]] = {
@@ -1741,7 +1745,40 @@ class DEA(Dataset[pd.DataFrame]):
         co2_ton_per_year = 86_477
         ch4_mwh_per_year = 52.123e6 * 35.8 / (Constants.GJ_PER_MWH * 1000)
         return co2_ton_per_year / ch4_mwh_per_year
+    
+    def get_cb_coefficient_biogas_CHP(self, year: int) -> float:
+        """returns the Cb coefficient (power-to-heat ratio) of biogas CHP engines.
 
+        Values from the DEA technology catalogue for electricity and district
+        heating (06 Gas engines, biogas; Engine - back pressure - biogas -
+        small): Cb coefficient (50°C/100°C) of 0.86 (2020), 0.92 (2030) and
+        1.0 (2050), linearly interpolated in between. DEA reports no heat
+        efficiency for this technology, so the heat output is derived as
+        electricity / Cb.
+        https://ens.dk/en/analyses-and-statistics/technology-data-generation-electricity-and-district-heating
+        """
+        years = [2020, 2030, 2050]
+        cb = [0.86, 0.92, 1.0]
+        return float(np.interp(year, years, cb))
+
+    def get_conversion_factor_biogas_CHP_CCS(self):
+        """returns the conversion factor for biogas CHP CCS.
+
+        Values from the DEA technology catalogue for carbon capture, transport
+        and storage (Post-combustion carbon capture retrofit - 100 MW(th) WtE
+        or biomass CHP plant, used as a proxy entry, 2025): 0.833 MWh heat and
+        0.03 MWh electricity per tCO2 captured. The capture heat is taken from
+        the engine's heat output and therefore enters as district heat. DEA's
+        recoverable low-temperature heat (60 °C) is not credited, and CO2
+        liquefaction is not included, as for the other post-combustion
+        retrofits.
+        https://ens.dk/en/analyses-and-statistics/technology-data-carbon-capture-transport-and-storage
+        """
+        return [
+            {"district_heat": {"default_value": 0.833, "unit": "GWh/kilotCO2"}},
+            {"electricity": {"default_value": 0.03, "unit": "GWh/kilotCO2"}},
+        ]
+    
     def get_conversion_factor_district_heating_grid(self):
         """returns the conversion factor for district heating grids.
 
