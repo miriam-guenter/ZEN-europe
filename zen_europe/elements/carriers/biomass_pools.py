@@ -31,6 +31,12 @@ class CombustionBiomass(BiomassPool):
 
     name: str = "comb_biomass"
 
+class HeatingBiomass(BiomassPool):
+    """Clean woody biomass (logs, chips, pellets) for decentralized heating
+    boilers. """
+
+    name: str = "heating_biomass"
+
 class GasificationBiomass(BiomassPool):
     """Solid biomass for gasification."""
 
@@ -81,5 +87,5 @@ class BiomassFastPyrolysis(BiomassPool):
 BIOMASS_POOLS = [
     CombustionBiomass, GasificationBiomass, BiogasFeedstock, WetBiomassBiogas, 
     DryBiomassBiogas, CellulosicBiomass, OilyBiomass, BiomassSlowPyrolysis, 
-    BiomassFastPyrolysis,
+    BiomassFastPyrolysis, HeatingBiomass
 ]

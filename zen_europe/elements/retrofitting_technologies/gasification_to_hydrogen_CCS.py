@@ -118,7 +118,7 @@ class GasificationToHydrogenCCS(RetrofittingTechnology):
             if "gasif_biomass" in entry
         )
         return (
-            ipcc_emission_factors.data["biomass"]
+            ipcc_emission_factors.data["gasif_biomass"]
             * biomass_input
             * ganter_dataset.get_capture_rate_gasification_to_hydrogen()
         )

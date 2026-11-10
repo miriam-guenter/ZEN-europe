@@ -62,6 +62,9 @@ class IPCCEmissionFactors(Dataset[pd.Series]):
         )  # Coking Coal/Other bituminous Coal
         data["lignite"] = 101000 * conversion_factor  # Lignite
         data["biomass"] = 112000 * conversion_factor  # Wood/Wood Waste
+            # solid biomass pools use the wood/wood-waste factor (needed for CCS sizing)
+        for pool in ("comb_biomass", "gasif_biomass", "heating_biomass"):
+            data[pool] = data["biomass"]        
         data["biogas"] = 54600 * conversion_factor  # Landfill/Sludge/Other Biogas
 
         return pd.Series(data)

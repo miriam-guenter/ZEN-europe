@@ -40,9 +40,9 @@ class BiomassBoiler(ConversionTechnology):
 
     def _set_input_carrier(self) -> Attribute:
         """
-        Sets the input carrier of biomass boilers to biomass.
+        Sets the input carrier of biomass boilers to the heating biomass pool.
         """
-        return Attribute(name="input_carrier", default_value=["biomass"], element=self)
+        return Attribute(name="input_carrier", default_value=["heating_biomass"], element=self)
 
     def _set_output_carrier(self) -> Attribute:
         """
@@ -73,7 +73,7 @@ class BiomassBoiler(ConversionTechnology):
         )
         eff, agencies = tech_db.get_efficiency(self)
         eff = eff.loc[self.settings.time.reference_year]
-        cf = [{"biomass": {"default_value": 1 / eff, "unit": "GW/GW"}}]
+        cf = [{"heating_biomass": {"default_value": 1 / eff, "unit": "GW/GW"}}]
         source = SourceInformation(
             description=(
                 "The conversion factor of biomass boilers is based on data from "

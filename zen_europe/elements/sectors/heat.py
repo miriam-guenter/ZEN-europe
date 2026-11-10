@@ -16,7 +16,7 @@ class HeatSector(Sector):
     """Decentralized heat generation."""
 
     name = "heat"
-    required_sectors = ["electricity", "gas"]
+    required_sectors = ["electricity", "gas", "biomass"]
 
     def __init__(self) -> None:
         super().__init__()

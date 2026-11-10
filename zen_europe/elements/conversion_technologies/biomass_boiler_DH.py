@@ -78,7 +78,7 @@ class BiomassBoilerDH(ConversionTechnology):
         )
         eff, agencies = tech_db.get_efficiency(self)
         eff = eff.loc[self.settings.time.reference_year]
-        cf = [{"biomass": {"default_value": 1 / eff, "unit": "GW/GW"}}]
+        cf = [{"comb_biomass": {"default_value": 1 / eff, "unit": "GW/GW"}}]
         source = SourceInformation(
             description=(
                 "The conversion factor of district heating biomass boilers is based on "

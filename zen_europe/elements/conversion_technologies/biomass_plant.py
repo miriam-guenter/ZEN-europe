@@ -50,7 +50,7 @@ class BiomassPlant(ConversionTechnology):
         """
         Sets the input carrier of biomass plants to biomass.
         """
-        return Attribute(name="input_carrier", default_value=["biomass"], element=self)
+        return Attribute(name="input_carrier", default_value=["comb_biomass"], element=self)
 
     def _set_output_carrier(self) -> Attribute:
         """
@@ -99,7 +99,7 @@ class BiomassPlant(ConversionTechnology):
             )
         conversion_factor = [
             {
-                "biomass": {"default_value": 1 / efficiency, "unit": "GWh/GWh"},
+                "comb_biomass": {"default_value": 1 / efficiency, "unit": "GWh/GWh"},
             }
         ]
         attr = self.conversion_factor
@@ -108,7 +108,7 @@ class BiomassPlant(ConversionTechnology):
             source=SourceInformation(
                 description=(
                     "The conversion factor is derived from the Eurostat dataset as "
-                    "the total consumption of biomass divided by "
+                    "the total consumption of primary solid biofuels divided by "
                     "the total electricity generation from biomass plants."
                 ),
                 metadata=eurostat_db.metadata,
