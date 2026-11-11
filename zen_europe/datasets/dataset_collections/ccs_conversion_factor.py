@@ -198,46 +198,49 @@ class CCSConversionFactor(DatasetCollection):
         )
 
 
-    def get_retrofit_flow_coupling_factor_biogas_CHP_CCS(
-        self, element: RetrofittingTechnology, base_tech: ConversionTechnology
+    def get_retrofit_flow_coupling_factor_CHP_CCS(
+        self,
+        element: RetrofittingTechnology,
+        base_tech: ConversionTechnology,
+        fuel_co2_content: float = 0.0,
     ) -> Attribute:
         """
-        Get the retrofit flow coupling factor for biogas CHP CCS [tCO2/MWh_el].
+        Get the retrofit flow coupling factor for CHP CCS [tCO2/MWh_el].
 
-        The flue gas of a biogas engine contains the CO2 from burning the
-        methane and the CO2 that was already in the raw biogas. The captured
-        CO2 per unit of electricity is therefore
-        (combustion CO2 + contained CO2) * capture rate * biogas input.
+        The captured CO2 per unit of electricity is the CO2 in the flue gas per
+        unit of fuel times the capture rate and the fuel input per unit of
+        electricity. The flue gas CO2 is the combustion CO2 of the fuel (IPCC)
+        plus, for fuels that already contain CO2 such as raw biogas,
+        `fuel_co2_content` [tCO2/MWh fuel].
         """
         dea = cast(DEA, self.data["dea"])
-        ipcc_emission_factors = cast(
-            IPCCEmissionFactors, self.data["ipcc_emission_factors"]
-        )
         conversion_factors = cast(
             list[dict[str, dict[str, float]]], base_tech.conversion_factor.default_value
         )
-        biogas_input = next(
-            entry["biogas"]["default_value"]
-            for entry in conversion_factors
-            if "biogas" in entry
+        fuel = cast(list[str], base_tech.input_carrier.default_value)[0]
+        fuel_input = next(
+            entry[fuel]["default_value"] for entry in conversion_factors if fuel in entry
         )
-        co2_combustion = float(ipcc_emission_factors.data["biogas"])
-        co2_contained = dea.get_co2_content_biogas()
-        capture_rate = dea.get_capture_rate_CCS()
-        carbon_removal_factor = (
-            (co2_combustion + co2_contained) * capture_rate * biogas_input
+        combustion_co2 = self.get_carbon_removal_factor(
+            element=base_tech, conversion_factor=fuel_input
         )
+        contained_co2 = fuel_co2_content * dea.get_capture_rate_CCS() * fuel_input
+        carbon_removal_factor = combustion_co2 + contained_co2
         attr = element.retrofit_flow_coupling_factor
         return attr.set_data(
             default_value=carbon_removal_factor,
             unit="tCO2/MWh",
             source=SourceInformation(
                 description=(
-                    "The retrofit flow coupling factor of biogas CHP CCS is the CO2 "
-                    "in the engine flue gas per unit of electricity, times the "
-                    "capture rate: the combustion CO2 of biogas (IPCC) plus the CO2 "
-                    "already contained in raw biogas (DEA), multiplied by the "
-                    "engine's biogas input per unit of electricity."
+                    f"The retrofit flow coupling factor of {element.name} is the CO2 "
+                    f"in the flue gas of {base_tech.name} per unit of electricity, "
+                    f"times the capture rate: the combustion CO2 of {fuel} (IPCC)"
+                    + (
+                        " plus the CO2 already contained in the fuel (DEA)"
+                        if fuel_co2_content
+                        else ""
+                    )
+                    + ", multiplied by the fuel input per unit of electricity."
                 ),
                 metadata=self.metadata,
             ),

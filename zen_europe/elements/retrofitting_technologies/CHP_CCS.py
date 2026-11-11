@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, ClassVar, cast
 
 from zen_europe.datasets.dataset_collections.ccs_conversion_factor import (
     CCSConversionFactor,
@@ -28,12 +28,17 @@ from zen_creator import (
 )
 
 
-class BiogasCHPCCS(RetrofittingTechnology):
-    """Class containing all data and assumptions for biogas CHP engines
-    retrofitted with post-combustion carbon capture (CCS)."""
+class CHPPostCombustionCCS(RetrofittingTechnology):
+    """Base class for CHP plants retrofitted with post-combustion carbon capture
+    (CCS). Costs, heat and electricity demand are taken from DEA's
+    post-combustion capture retrofit of a 100 MW(th) WtE or biomass CHP plant.
+    The capture heat is taken from the plant's district heat output.
+    Subclasses only set `name`, `base_technology_name` and, if the fuel already
+    contains CO2, `_get_fuel_co2_content`."""
 
-    name: str = "biogas_CHP_CCS"
-    base_technology_name: str = "biogas_CHP"
+    name: str = "CHP_post_combustion_CCS"
+    # intermediate base class: adds no folder level to the output path
+    subpath: ClassVar[str] = ""
 
     def __init__(self, model: Model, power_unit: str = "tCO2/h"):
         super().__init__(model=model, power_unit=power_unit)
@@ -42,7 +47,7 @@ class BiogasCHPCCS(RetrofittingTechnology):
 
     def _set_reference_carrier(self) -> Attribute:
         """
-        Sets the reference carrier of biogas CHP CCS to carbon.
+        Sets the reference carrier of CHP CCS to carbon.
         """
         return Attribute(
             name="reference_carrier", default_value=["carbon"], element=self
@@ -50,8 +55,8 @@ class BiogasCHPCCS(RetrofittingTechnology):
 
     def _set_input_carrier(self) -> Attribute:
         """
-        Sets the input carrier of biogas CHP CCS to district heat (capture heat
-        taken from the engine) and electricity.
+        Sets the input carrier of CHP CCS to district heat (capture heat taken
+        from the CHP plant) and electricity.
         """
         return Attribute(
             name="input_carrier",
@@ -61,13 +66,13 @@ class BiogasCHPCCS(RetrofittingTechnology):
 
     def _set_output_carrier(self) -> Attribute:
         """
-        Set the output carrier of biogas CHP CCS to carbon.
+        Set the output carrier of CHP CCS to carbon.
         """
         return Attribute(name="output_carrier", default_value=["carbon"], element=self)
 
     def _set_retrofit_reference_carrier(self) -> Attribute:
         """
-        Sets the retrofit reference carrier of biogas CHP CCS to carbon.
+        Sets the retrofit reference carrier of CHP CCS to carbon.
         """
         return Attribute(
             name="retrofit_reference_carrier", default_value=["carbon"], element=self
@@ -77,7 +82,7 @@ class BiogasCHPCCS(RetrofittingTechnology):
 
     def _set_lifetime(self) -> Attribute:
         """
-        Sets the lifetime of biogas CHP CCS.
+        Sets the lifetime of CHP CCS.
         """
         tech_db = TechnologyCostDatabase(
             settings=self.settings, source_path=self.source_path
@@ -86,7 +91,7 @@ class BiogasCHPCCS(RetrofittingTechnology):
 
     def _set_construction_time(self) -> Attribute:
         """
-        Sets the construction time of biogas CHP CCS.
+        Sets the construction time of CHP CCS.
         """
         if self.settings.investment.use_construction_times:
             tech_db = TechnologyCostDatabase(
@@ -98,22 +103,22 @@ class BiogasCHPCCS(RetrofittingTechnology):
 
     def _set_conversion_factor(self) -> Attribute:
         """
-        Return the conversion factor of biogas CHP CCS.
+        Return the conversion factor of CHP CCS.
 
         Values from the DEA technology catalogue for carbon capture, transport
         and storage (Post-combustion carbon capture retrofit - 100 MW(th) WtE
-        or biomass CHP plant, used as a proxy entry).
+        or biomass CHP plant).
         """
         attr = self.conversion_factor
         dea_dataset = DEA(source_path=self.source_path)
-        cf = dea_dataset.get_conversion_factor_biogas_CHP_CCS()
+        cf = dea_dataset.get_conversion_factor_CHP_CCS()
         source = SourceInformation(
             description=(
-                "The conversion factor of biogas CHP CCS is based on the DEA "
+                f"The conversion factor of {self.name} is based on the DEA "
                 "technology catalogue for carbon capture, transport and storage "
                 "(Post-combustion carbon capture retrofit - 100 MW(th) WtE or "
-                "biomass CHP plant, used as a proxy entry). The capture heat is "
-                "taken from the engine's district heat output."
+                "biomass CHP plant). The capture heat is taken from the CHP "
+                "plant's district heat output."
             ),
             metadata=dea_dataset.metadata,
         )
@@ -122,7 +127,7 @@ class BiogasCHPCCS(RetrofittingTechnology):
 
     def _set_capex_specific_conversion(self) -> Attribute:
         """
-        Sets the specific capital expenditure (capex) for biogas CHP CCS.
+        Sets the specific capital expenditure (capex) for CHP CCS.
         """
         tech_db = TechnologyCostDatabase(
             settings=self.settings, source_path=self.source_path
@@ -131,8 +136,7 @@ class BiogasCHPCCS(RetrofittingTechnology):
 
     def _set_opex_specific_fixed(self) -> Attribute:
         """
-        Sets the specific fixed operational expenditure (opex) for biogas CHP
-        CCS.
+        Sets the specific fixed operational expenditure (opex) for CHP CCS.
         """
         tech_db = TechnologyCostDatabase(
             settings=self.settings, source_path=self.source_path
@@ -141,20 +145,26 @@ class BiogasCHPCCS(RetrofittingTechnology):
 
     def _set_opex_specific_variable(self) -> Attribute:
         """
-        Sets the specific variable operational expenditure (opex) for biogas
-        CHP CCS.
+        Sets the specific variable operational expenditure (opex) for CHP CCS.
         """
         tech_db = TechnologyCostDatabase(
             settings=self.settings, source_path=self.source_path
         )
         return tech_db.get_opex_specific_variable(self)
 
+    def _get_fuel_co2_content(self) -> float:
+        """
+        CO2 already contained in the fuel [tCO2/MWh fuel], which ends up in the
+        flue gas next to the combustion CO2. None for solid fuels.
+        """
+        return 0.0
+
     def _set_retrofit_flow_coupling_factor(self) -> Attribute:
         """
-        Return the retrofit flow coupling factor of biogas CHP CCS.
+        Return the retrofit flow coupling factor of CHP CCS.
 
         This factor represents the amount of CO2 captured per unit of
-        electricity produced by the biogas CHP engine.
+        electricity produced by the CHP plant.
         """
         ccs_cf = CCSConversionFactor(
             settings=self.settings, source_path=self.source_path
@@ -162,15 +172,18 @@ class BiogasCHPCCS(RetrofittingTechnology):
         base_tech = cast(
             ConversionTechnology, self.model.elements[self.base_technology_name]
         )
-        return ccs_cf.get_retrofit_flow_coupling_factor_biogas_CHP_CCS(
-            element=self, base_tech=base_tech
+        return ccs_cf.get_retrofit_flow_coupling_factor_CHP_CCS(
+            element=self,
+            base_tech=base_tech,
+            fuel_co2_content=self._get_fuel_co2_content(),
         )
 
     def _set_capacity_existing(self) -> Attribute:
         """
-        Sets the existing capacity of biogas CHP CCS.
+        Sets the existing capacity of CHP CCS.
 
-        No biogas CHP plant with carbon capture is listed in the IOGP report.
+        The IOGP report assigns carbon capture at biomass power plants to
+        `biomass_plant_CCS`, so no existing capacity is assigned here.
         """
         attr = self.capacity_existing
         attr.set_data(
@@ -178,7 +191,9 @@ class BiogasCHPCCS(RetrofittingTechnology):
             df=None,
             source=AssumptionInformation(
                 description=(
-                    "No existing biogas CHP plants with carbon capture are assumed."
+                    f"No existing capacity of {self.name} is assumed; carbon capture "
+                    "projects at biomass power plants in the IOGP report are assigned "
+                    "to biomass_plant_CCS."
                 ),
             ),
         )
@@ -186,7 +201,7 @@ class BiogasCHPCCS(RetrofittingTechnology):
 
     def _set_max_diffusion_rate(self) -> Attribute:
         """
-        Sets the maximum diffusion rate of biogas CHP CCS.
+        Sets the maximum diffusion rate of CHP CCS.
         """
         if not self.settings.investment.use_diffusion_rates:
             return self.max_diffusion_rate
@@ -195,7 +210,7 @@ class BiogasCHPCCS(RetrofittingTechnology):
 
     def _set_capacity_addition_unbounded(self) -> Attribute:
         """
-        Sets the unbounded capacity addition of biogas CHP CCS.
+        Sets the unbounded capacity addition of CHP CCS.
 
         Capacity additions up to the size of a single reference project are
         exempt from the diffusion limit, so that a first plant can be built
@@ -221,3 +236,26 @@ class BiogasCHPCCS(RetrofittingTechnology):
                 metadata=iogp_projects.metadata,
             ),
         )
+
+
+class BiomassCHPCCS(CHPPostCombustionCCS):
+    """Biomass CHP plants retrofitted with post-combustion carbon capture."""
+
+    name: str = "biomass_CHP_CCS"
+    base_technology_name: str = "biomass_CHP"
+
+
+class BiogasCHPCCS(CHPPostCombustionCCS):
+    """Biogas CHP engines retrofitted with post-combustion carbon capture. DEA
+    has no capture entry for gas engines, so the CHP retrofit is used as a
+    proxy."""
+
+    name: str = "biogas_CHP_CCS"
+    base_technology_name: str = "biogas_CHP"
+
+    def _get_fuel_co2_content(self) -> float:
+        """
+        Raw biogas contains CO2 next to the methane, which also ends up in the
+        engine flue gas.
+        """
+        return DEA(source_path=self.source_path).get_co2_content_biogas()

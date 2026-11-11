@@ -8,6 +8,7 @@ from zen_europe.elements.carriers.oil import Oil
 from zen_europe.elements.carriers.uranium import Uranium
 from zen_europe.elements.carriers.waste import Waste
 from zen_europe.elements.conversion_technologies.biomass_CHP import BiomassCHP
+from zen_europe.elements.conversion_technologies.biogas_CHP import BiogasCHP
 from zen_europe.elements.conversion_technologies.biomass_plant import BiomassPlant
 from zen_europe.elements.conversion_technologies.hard_coal_plant import HardCoalPlant
 from zen_europe.elements.conversion_technologies.lignite_coal_plant import (
@@ -27,6 +28,9 @@ from zen_europe.elements.conversion_technologies.wind_offshore import WindOffsho
 from zen_europe.elements.conversion_technologies.wind_onshore import WindOnshore
 from zen_europe.elements.retrofitting_technologies.biomass_plant_CCS import (
     BiomassPlantCCS,
+)
+from zen_europe.elements.retrofitting_technologies.CHP_CCS import (
+    BiogasCHPCCS, BiomassCHPCCS,
 )
 from zen_europe.elements.retrofitting_technologies.natural_gas_turbine_CCS import (
     NaturalGasTurbineCCS,
@@ -55,6 +59,9 @@ class ElectricitySector(Sector):
             RunOfRiverHydro,
             LigniteCoalPlant,
             BiomassCHP,
+            BiogasCHP,
+            BiogasCHPCCS,
+            BiomassCHPCCS,
             BiomassPlant,
             OilPlant,
             WastePlant,

@@ -9,7 +9,7 @@ from .NG_DRI_CCS import NG_DRI_CCS
 from .SMR_CCS import SMR_CCS
 from .waste_to_cement_fuel import WasteToCementFuel
 from .biogas_upgrading_CCS import BiogasUpgradingCCS
-from .biogas_CHP_CCS import BiogasCHPCCS
+from .CHP_CCS import BiogasCHPCCS, BiomassCHPCCS
 from .ethanol_CCS import Ethanol1GStarchCCS, EthanolCellulosicCCS
 from .gasification_to_hydrogen_CCS import GasificationToHydrogenCCS
 
@@ -17,6 +17,7 @@ __all__ = [
     "NaturalGasTurbineCCS",
     "BiomassPlantCCS",
     "BiogasCHPCCS",
+    "BiomassCHPCCS",
     "SMR_CCS",
     "CementPostComb",
     "BF_BOF_CCS",

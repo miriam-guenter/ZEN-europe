@@ -165,6 +165,9 @@ _CCS_TECHS: dict[str, str] = {
     "biogas_CHP_CCS": (
         "Post-combustion carbon capture retrofit - 100 MW(th) WtE or biomass CHP plant"
     ),
+    "biomass_CHP_CCS": (
+        "Post-combustion carbon capture retrofit - 100 MW(th) WtE or biomass CHP plant"
+    ),
 }
 # DAC has no reported variable O&M figure.
 _CCS_COST_PARS: dict[str, dict[str, str]] = {
@@ -1761,17 +1764,17 @@ class DEA(Dataset[pd.DataFrame]):
         cb = [0.86, 0.92, 1.0]
         return float(np.interp(year, years, cb))
 
-    def get_conversion_factor_biogas_CHP_CCS(self):
-        """returns the conversion factor for biogas CHP CCS.
+    def get_conversion_factor_CHP_CCS(self):
+        """returns the conversion factor for CHP plants with post-combustion CCS.
 
         Values from the DEA technology catalogue for carbon capture, transport
         and storage (Post-combustion carbon capture retrofit - 100 MW(th) WtE
-        or biomass CHP plant, used as a proxy entry, 2025): 0.833 MWh heat and
-        0.03 MWh electricity per tCO2 captured. The capture heat is taken from
-        the engine's heat output and therefore enters as district heat. DEA's
-        recoverable low-temperature heat (60 °C) is not credited, and CO2
-        liquefaction is not included, as for the other post-combustion
-        retrofits.
+        or biomass CHP plant, 2025): 0.833 MWh heat and 0.03 MWh electricity
+        per tCO2 captured. The capture heat is taken from the CHP plant's heat
+        output and therefore enters as district heat. DEA's recoverable
+        low-temperature heat (60 °C) is not credited, and CO2 liquefaction is
+        not included, as for the other post-combustion retrofits. Used for
+        biomass CHP plants and, as a proxy, for biogas CHP engines.
         https://ens.dk/en/analyses-and-statistics/technology-data-carbon-capture-transport-and-storage
         """
         return [

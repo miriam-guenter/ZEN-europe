@@ -15,8 +15,9 @@ from zen_europe.elements.retrofitting_technologies.biogas_upgrading_CCS import (
     BiogasUpgradingCCS,
 )
 from zen_europe.elements.conversion_technologies.biogas_CHP import BiogasCHP
-from zen_europe.elements.retrofitting_technologies.biogas_CHP_CCS import (
-    BiogasCHPCCS,
+from zen_europe.elements.conversion_technologies.biomass_CHP import BiomassCHP
+from zen_europe.elements.retrofitting_technologies.CHP_CCS import (
+    BiogasCHPCCS, BiomassCHPCCS
 )
 from zen_europe.elements.conversion_technologies.pyrolysis_fast import FastPyrolysis
 from zen_europe.elements.conversion_technologies.pyrolysis_slow import SlowPyrolysis
@@ -57,7 +58,9 @@ class BiomassSector(Sector):
             Digestate,
             BiogasUpgradingCCS,
             BiogasCHP,
+            BiomassCHP,
             BiogasCHPCCS,
+            BiomassCHPCCS,
             PyrolysisOil,
             FastPyrolysis,
             SlowPyrolysis,

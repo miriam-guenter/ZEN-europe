@@ -20,6 +20,7 @@ from zen_europe.elements.retrofitting_technologies.NG_DRI_CCS import NG_DRI_CCS
 from zen_europe.elements.retrofitting_technologies.SMR_CCS import SMR_CCS
 from zen_europe.elements.transport_technologies.carbon_pipeline import CarbonPipeline
 from zen_europe.elements.retrofitting_technologies.biogas_upgrading_CCS import BiogasUpgradingCCS
+from zen_europe.elements.retrofitting_technologies.CHP_CCS import BiogasCHPCCS, BiomassCHPCCS
 from zen_europe.elements.retrofitting_technologies.ethanol_CCS import (
     Ethanol1GStarchCCS,
     EthanolCellulosicCCS,
@@ -43,6 +44,8 @@ class CarbonSector(Sector):
             DAC,
             NaturalGasTurbineCCS,
             BiomassPlantCCS,
+            BiogasCHPCCS,
+            BiomassCHPCCS,
             SMR_CCS,
             CementPostComb,
             BF_BOF_CCS,
