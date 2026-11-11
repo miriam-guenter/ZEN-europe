@@ -133,6 +133,7 @@ class TechnologyDiffusionMannhardt(Dataset[dict[str, pd.DataFrame]]):
         "ethanol_1G_starch_CCS",
         "ethanol_1G_sugar_CCS",
         "ethanol_cellulosic_CCS",
+        "ethanol_to_kerosene",
         "HVO_diesel",
         "HVO_jet",
         "methanol_to_kerosene",

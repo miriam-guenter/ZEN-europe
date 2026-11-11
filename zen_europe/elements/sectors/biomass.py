@@ -34,6 +34,7 @@ from zen_europe.elements.retrofitting_technologies.ethanol_CCS import (
     Ethanol1GStarchCCS, Ethanol1GSugarCCS, EthanolCellulosicCCS,
 )
 from zen_europe.elements.conversion_technologies.ethanol_to_gasoline import EthanolToGasoline
+from zen_europe.elements.conversion_technologies.ethanol_to_kerosene import EthanolToKerosene
 from zen_europe.elements.conversion_technologies.HVO_diesel import HVODiesel
 from zen_europe.elements.conversion_technologies.HVO_jet import HVOJet
 from zen_europe.elements.conversion_technologies.fischer_tropsch_biomass import FischerTropschBiomass
@@ -75,6 +76,7 @@ class BiomassSector(Sector):
             Ethanol1GSugarCCS,
             EthanolCellulosicCCS,
             EthanolToGasoline,
+            EthanolToKerosene,
             HVODiesel,
             HVOJet,
             FischerTropschBiomass,

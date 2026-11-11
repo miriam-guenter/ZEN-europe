@@ -23,6 +23,7 @@ from .ethanol_1G_starch import Ethanol1GStarch
 from .ethanol_1G_sugar import Ethanol1GSugar
 from .ethanol_cellulosic import EthanolCellulosic
 from .ethanol_to_gasoline import EthanolToGasoline
+from .ethanol_to_kerosene import EthanolToKerosene
 from .FAME import FAME
 from .fischer_tropsch import FischerTropsch
 from .fischer_tropsch_biomass import FischerTropschBiomass
@@ -156,6 +157,7 @@ __all__ = [
     "Ethanol1GSugar",
     "EthanolCellulosic",
     "EthanolToGasoline",
+    "EthanolToKerosene",
     "HVODiesel",
     "HVOJet",
 ]
