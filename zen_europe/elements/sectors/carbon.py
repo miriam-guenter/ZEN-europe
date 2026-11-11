@@ -22,8 +22,7 @@ from zen_europe.elements.transport_technologies.carbon_pipeline import CarbonPip
 from zen_europe.elements.retrofitting_technologies.biogas_upgrading_CCS import BiogasUpgradingCCS
 from zen_europe.elements.retrofitting_technologies.CHP_CCS import BiogasCHPCCS, BiomassCHPCCS
 from zen_europe.elements.retrofitting_technologies.ethanol_CCS import (
-    Ethanol1GStarchCCS,
-    EthanolCellulosicCCS,
+    Ethanol1GStarchCCS, Ethanol1GSugarCCS, EthanolCellulosicCCS,
 )
 
 from zen_europe.elements.retrofitting_technologies.gasification_to_hydrogen_CCS import (
@@ -54,6 +53,7 @@ class CarbonSector(Sector):
             Carbon,
             BiogasUpgradingCCS,
             Ethanol1GStarchCCS,
+            Ethanol1GSugarCCS,
             EthanolCellulosicCCS,
             GasificationToHydrogenCCS,
         ]

@@ -10,7 +10,7 @@ from .SMR_CCS import SMR_CCS
 from .waste_to_cement_fuel import WasteToCementFuel
 from .biogas_upgrading_CCS import BiogasUpgradingCCS
 from .CHP_CCS import BiogasCHPCCS, BiomassCHPCCS
-from .ethanol_CCS import Ethanol1GStarchCCS, EthanolCellulosicCCS
+from .ethanol_CCS import Ethanol1GStarchCCS, Ethanol1GSugarCCS, EthanolCellulosicCCS
 from .gasification_to_hydrogen_CCS import GasificationToHydrogenCCS
 
 __all__ = [
@@ -28,6 +28,7 @@ __all__ = [
     "BiomassToCementFuel",
     "BiogasUpgradingCCS",
     "Ethanol1GStarchCCS",
+    "Ethanol1GSugarCCS",
     "EthanolCellulosicCCS",
     "GasificationToHydrogenCCS",
 ]

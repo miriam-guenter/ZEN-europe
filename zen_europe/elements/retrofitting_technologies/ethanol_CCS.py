@@ -246,10 +246,16 @@ class FermentationCCS(RetrofittingTechnology):
 
 
 class Ethanol1GStarchCCS(FermentationCCS):
-    """Capture of the fermentation CO2 of first generation ethanol."""
+    """Capture of the fermentation CO2 of first generation ethanol from starch."""
 
     name: str = "ethanol_1G_starch_CCS"
     base_technology_name: str = "ethanol_1G_starch"
+
+class Ethanol1GSugarCCS(FermentationCCS):
+    """Capture of the fermentation CO2 of first generation ethanol from sugar."""
+
+    name: str = "ethanol_1G_sugar_CCS"
+    base_technology_name: str = "ethanol_1G_sugar"
 
 
 class EthanolCellulosicCCS(FermentationCCS):
