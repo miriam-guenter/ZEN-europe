@@ -11,6 +11,7 @@ from .digestate import Digestate
 from .district_heat import DistrictHeat
 from .electricity import Electricity
 from .ethanol import Ethanol
+from .ethanol_residues import EthanolResidues
 from .fuel_for_cement import FuelForCement
 from .gasoline import Gasoline
 from .hard_coal import HardCoal
@@ -45,6 +46,7 @@ __all__ = [
     "Biogas",
     "Digestate",
     "Ethanol",
+    "EthanolResidues",
     "Hydrogen",
     "PrimarySteel",
     "SecondarySteel",

@@ -25,6 +25,8 @@ from zen_europe.elements.carriers.pyrolysis_oil import PyrolysisOil
 from zen_europe.elements.conversion_technologies.FAME import FAME
 from zen_europe.elements.carriers.ethanol import Ethanol
 from zen_europe.elements.conversion_technologies.ethanol_1G_starch import Ethanol1GStarch
+from zen_europe.elements.conversion_technologies.ethanol_1G_sugar import Ethanol1GSugar
+from zen_europe.elements.carriers.ethanol_residues import EthanolResidues
 from zen_europe.elements.conversion_technologies.ethanol_cellulosic import (
     EthanolCellulosic,
 )
@@ -67,6 +69,8 @@ class BiomassSector(Sector):
             FAME,
             Ethanol,
             Ethanol1GStarch,
+            Ethanol1GSugar,
+            EthanolResidues,
             EthanolCellulosic,
             Ethanol1GStarchCCS,
             EthanolCellulosicCCS,

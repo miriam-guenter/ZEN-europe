@@ -21,7 +21,7 @@ BIOMASS_ROUTES: dict[str, list[str]] = {
         "agri_residues_woody", "wood_waste",
     ],
     "dry_biomass_biogas": ["starch_crops", "perennial_grasses", "agri_residues_herb"],
-    "wet_biomass_biogas": ["manure", "sugar_crops", "biowaste", "sludge"],
+    "wet_biomass_biogas": ["manure", "sugar_crops", "biowaste", "sludge", "ethanol_residues"],
     "cellulosic_biomass": ["agri_residues_herb", "perennial_grasses"],
     "oily_biomass": ["oil_crops"],
     "biomass_slow_pyrolysis": [

@@ -49,13 +49,12 @@ class Ethanol1GStarch(ConversionTechnology):
             element=self,
         )
 
-#TODO: Add distillers' dried grains (DDG) as a by-product output carrier in the future. (with export price)
     def _set_output_carrier(self) -> Attribute:
         """
-        Set the output carrier of first generation ethanol to ethanol. The
-        distillers' dried grains are not yet modelled.
+        Set the output carrier of first generation ethanol to ethanol and
+        ethanol residues (the distillers' grains, not dried).
         """
-        return Attribute(name="output_carrier", default_value=["ethanol"], element=self)
+        return Attribute(name="output_carrier", default_value=["ethanol", "ethanol_residues"], element=self)
 
     # ---------- Required methods that are called during object build ----------
 

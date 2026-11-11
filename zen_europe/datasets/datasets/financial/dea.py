@@ -1639,15 +1639,23 @@ class DEA(Dataset[pd.DataFrame]):
         Values from the DEA technology catalogue for renewable fuels (105 First
         generation ethanol, grain-based), per MWh of total input: 0.83 MWh
         feedstock, 0.15 MWh natural gas and 0.02 MWh electricity yield 0.46 MWh
-        ethanol and 0.27 MWh distillers' dried grains (DDG, not yet modelled).
-        Normalized to the ethanol reference carrier.
+        ethanol and 0.27 MWh distillers' dried grains (DDG). Normalized to the
+        ethanol reference carrier.
+
+        The distillers' grains are not dried: they are an output as wet ethanol
+        residues (whole stillage), with the energy of the DDG. The drying is left
+        out, which saves about a third of the natural gas of a dry-grind plant
+        (assumption, US Patent 7,524,418, background section).
         https://ens.dk/en/analyses-and-statistics/technology-data-renewable-fuels
         """
         ethanol_output = 0.46  # MWh ethanol / MWh total input
+        ddg_drying_share = 1 / 3  # share of the natural gas used to dry the DDG
+        natural_gas = 0.15 * (1 - ddg_drying_share)
         return [
             {"starch_crops": {"default_value": 0.83 / ethanol_output, "unit": "GWh/GWh"}},
-            {"natural_gas": {"default_value": 0.15 / ethanol_output, "unit": "GWh/GWh"}},
+            {"natural_gas": {"default_value": natural_gas / ethanol_output, "unit": "GWh/GWh"}},
             {"electricity": {"default_value": 0.02 / ethanol_output, "unit": "GWh/GWh"}},
+            {"ethanol_residues": {"default_value": 0.27 / ethanol_output, "unit": "GWh/GWh"}},
         ]
 
     def get_conversion_factor_ethanol_cellulosic(self):

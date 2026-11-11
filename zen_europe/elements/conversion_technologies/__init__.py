@@ -20,6 +20,7 @@ from .electrode_boiler import ElectrodeBoiler
 from .electrode_boiler_DH import ElectrodeBoilerDH
 from .electrolysis import Electrolysis
 from .ethanol_1G_starch import Ethanol1GStarch
+from .ethanol_1G_sugar import Ethanol1GSugar
 from .ethanol_cellulosic import EthanolCellulosic
 from .ethanol_to_gasoline import EthanolToGasoline
 from .FAME import FAME
@@ -152,6 +153,7 @@ __all__ = [
     "HDT_FCEV",
     "FAME",
     "Ethanol1GStarch",
+    "Ethanol1GSugar",
     "EthanolCellulosic",
     "EthanolToGasoline",
     "HVODiesel",
