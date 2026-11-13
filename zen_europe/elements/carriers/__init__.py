@@ -14,6 +14,7 @@ from .ethanol import Ethanol
 from .ethanol_residues import EthanolResidues
 from .fuel_for_cement import FuelForCement
 from .gasoline import Gasoline
+from .glycerine import Glycerine
 from .hard_coal import HardCoal
 from .heat import Heat
 from .hydrogen import Hydrogen
@@ -72,4 +73,5 @@ __all__ = [
     "CrudeOil",
     "FuelForCement",
     "Uranium",
+    "Glycerine",
 ]

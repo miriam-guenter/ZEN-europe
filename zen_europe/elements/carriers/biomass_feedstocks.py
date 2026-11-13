@@ -14,9 +14,8 @@ from zen_europe.datasets.datasets.carrier.enspreso_biomass import (
 )
 from zen_europe.datasets.datasets.financial.ECB import ECBInflation
 
-# TODO: replace with sourced splits of ENSPRESO codes that map to two feedstocks
-AGRW1_WOODY_SHARE = 0.3  # MINBIOAGRW1 -> woody (prunings) vs. herbaceous (straw)
-MUN1_BIOWASTE_SHARE = 0.7  # MINBIOMUN1 -> biowaste vs. wood waste
+AGRW1_WOODY_SHARE = 0.1  # MINBIOAGRW1 -> woody (prunings) vs. herbaceous (straw) (based on MOPO data)
+MUN1_BIOWASTE_SHARE = 0.7  # MINBIOMUN1 -> biowaste vs. wood waste (based on MOPO data)
 
 
 class BiomassFeedstock(Carrier):

@@ -52,10 +52,9 @@ class FAME(ConversionTechnology):
 
     def _set_output_carrier(self) -> Attribute:
         """
-        Set the output carrier of FAME to diesel. The glycerine by-product is
-        not (yet) modelled.
+        Set the output carrier of FAME to diesel and the glycerine by-product.
         """
-        return Attribute(name="output_carrier", default_value=["diesel"], element=self)
+        return Attribute(name="output_carrier", default_value=["diesel", "glycerine"], element=self)
 
     # ---------- Required methods that are called during object build ----------
 

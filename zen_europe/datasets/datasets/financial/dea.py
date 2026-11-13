@@ -1553,7 +1553,6 @@ class DEA(Dataset[pd.DataFrame]):
             },
         ]
 
-# TODO: add glycerine as a co-product to the FAME conversion factor, once it is modelled in the energy system.
     def get_conversion_factor_FAME(self):
         """returns the conversion factor for FAME biodiesel production.
 
@@ -1561,8 +1560,8 @@ class DEA(Dataset[pd.DataFrame]):
         biodiesel (veg. oil), "Vegetable Oil FAME", 2020 values), per MWh of
         total input: 0.926 MWh vegetable oil, 0.046 MWh methanol, 0.024 MWh
         natural gas and 0.004 MWh electricity yield 0.903 MWh biodiesel and
-        0.039 MWh glycerine. The biodiesel is modelled as diesel and the
-        glycerine is not (yet) modelled. Normalized to the diesel reference carrier.
+        0.039 MWh glycerine. The biodiesel is modelled as diesel and glycerine
+        as glycerol. Normalized to the diesel reference carrier.
         https://ens.dk/en/analyses-and-statistics/technology-data-renewable-fuels
         """
         biodiesel_output = 0.903  # MWh biodiesel / MWh total input
@@ -1588,6 +1587,12 @@ class DEA(Dataset[pd.DataFrame]):
             {
                 "electricity": {
                     "default_value": 0.004 / biodiesel_output,
+                    "unit": "GWh/GWh",
+                }
+            },
+            {
+                "glycerine": {
+                    "default_value": 0.039 / biodiesel_output,
                     "unit": "GWh/GWh",
                 }
             },

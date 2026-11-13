@@ -11,23 +11,23 @@ from zen_creator import AssumptionInformation, Attribute, ConversionTechnology
 BIOMASS_ROUTES: dict[str, list[str]] = {
     "comb_biomass": [
         "stemwood", "forestry_residues", "src_crops", "perennial_grasses",
-        "agri_residues_woody", "agri_residues_herb", "wood_waste",
+        "agri_residues_woody", "agri_residues_herb", "wood_waste", "digestate",
     ],
     "heating_biomass": [
         "stemwood", "forestry_residues", "src_crops",    
     ],
     "gasif_biomass": [
         "stemwood", "forestry_residues", "src_crops", "perennial_grasses",
-        "agri_residues_woody", "wood_waste",
+        "agri_residues_woody", "wood_waste", "digestate", 
     ],
     "dry_biomass_biogas": ["starch_crops", "perennial_grasses", "agri_residues_herb"],
-    "wet_biomass_biogas": ["manure", "sugar_crops", "biowaste", "sludge", "ethanol_residues"],
+    "wet_biomass_biogas": ["manure", "sugar_crops", "biowaste", "sludge", "ethanol_residues", "glycerine"],
     "cellulosic_biomass": ["agri_residues_herb", "perennial_grasses"],
     "oily_biomass": ["oil_crops"],
     "biomass_slow_pyrolysis": [
         "stemwood", "forestry_residues", "src_crops", "perennial_grasses",
         "agri_residues_woody", "agri_residues_herb", "wood_waste",
-        "biowaste", "sludge", "digestate"
+        "biowaste", "sludge", "digestate", "ethanol_residues",
     ],
     "biomass_fast_pyrolysis": ["stemwood","forestry_residues", "src_crops"],
     "biogas_feedstock": ["wet_biomass_biogas"],
