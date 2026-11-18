@@ -22,6 +22,8 @@ from .forestry_residues_to_woody_biomass import ForestryResiduesToWoodyBiomass
 from .glycerine_to_wet_biomass_biogas import GlycerineToWetBiomassBiogas
 from .manure_to_wet_biomass_biogas import ManureToWetBiomassBiogas
 from .oil_crops_to_oily_biomass import OilCropsToOilyBiomass
+from .oilseed_meal_to_biomass_slow_pyrolysis import OilseedMealToBiomassSlowPyrolysis
+from .oilseed_meal_to_dry_biomass_biogas import OilseedMealToDryBiomassBiogas
 from .perennial_grasses_to_biomass_slow_pyrolysis import (
     PerennialGrassesToBiomassSlowPyrolysis,
 )
@@ -60,6 +62,7 @@ BIOMASS_ROUTE_TECHNOLOGIES = [
     StarchCropsToDryBiomassBiogas,
     PerennialGrassesToDryBiomassBiogas,
     AgriWasteToDryBiomassBiogas,
+    OilseedMealToDryBiomassBiogas,
     # -> wet_biomass_biogas
     ManureToWetBiomassBiogas,
     SugarCropsToWetBiomassBiogas,
@@ -83,6 +86,7 @@ BIOMASS_ROUTE_TECHNOLOGIES = [
     SludgeToBiomassSlowPyrolysis,
     DigestateToBiomassSlowPyrolysis,
     EthanolResiduesToBiomassSlowPyrolysis,
+    OilseedMealToBiomassSlowPyrolysis,
     # -> biogas_feedstock
     WetBiomassBiogasToBiogasFeedstock,
     # -> oil

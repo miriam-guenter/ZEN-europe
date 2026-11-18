@@ -24,6 +24,7 @@ from .methanol import Methanol
 from .naphtha import Naphtha
 from .natural_gas import NaturalGas
 from .oil import Oil
+from .oilseed_meal import OilseedMeal
 from .olefin import Olefin
 from .passenger_mileage import PassengerMileage
 from .primary_steel import PrimarySteel
@@ -70,4 +71,5 @@ __all__ = [
     "FuelForCement",
     "Uranium",
     "Glycerine",
+    "OilseedMeal",
 ]
