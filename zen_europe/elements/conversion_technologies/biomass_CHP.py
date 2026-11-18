@@ -46,7 +46,7 @@ class BiomassCHP(ConversionTechnology):
         """
         Sets the input carrier of biomass CHP plants to biomass.
         """
-        return Attribute(name="input_carrier", default_value=["comb_biomass"], element=self)
+        return Attribute(name="input_carrier", default_value=["solid_biomass"], element=self)
 
     def _set_output_carrier(self) -> Attribute:
         """
@@ -89,7 +89,7 @@ class BiomassCHP(ConversionTechnology):
         eff_el = eff_el.loc[reference_year]
         eff_th = eff_th.loc[reference_year]
         cf = [
-            {"comb_biomass": {"default_value": 1 / eff_el, "unit": "GWh/GWh"}},
+            {"solid_biomass": {"default_value": 1 / eff_el, "unit": "GWh/GWh"}},
             {"district_heat": {"default_value": eff_th / eff_el, "unit": "GWh/GWh"}},
         ]
         source = SourceInformation(

@@ -45,7 +45,7 @@ class FischerTropschBiomass(ConversionTechnology):
         The plant covers its own heat and power demand.
         """
         return Attribute(
-            name="input_carrier", default_value=["gasif_biomass"], element=self
+            name="input_carrier", default_value=["solid_biomass"], element=self
         )
 
     def _set_output_carrier(self) -> Attribute:

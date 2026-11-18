@@ -50,7 +50,7 @@ class BiomassPlant(ConversionTechnology):
         """
         Sets the input carrier of biomass plants to biomass.
         """
-        return Attribute(name="input_carrier", default_value=["comb_biomass"], element=self)
+        return Attribute(name="input_carrier", default_value=["solid_biomass"], element=self)
 
     def _set_output_carrier(self) -> Attribute:
         """
@@ -99,7 +99,7 @@ class BiomassPlant(ConversionTechnology):
             )
         conversion_factor = [
             {
-                "comb_biomass": {"default_value": 1 / efficiency, "unit": "GWh/GWh"},
+                "solid_biomass": {"default_value": 1 / efficiency, "unit": "GWh/GWh"},
             }
         ]
         attr = self.conversion_factor

@@ -215,7 +215,7 @@ class Aidres(Dataset[dict[str, pd.DataFrame]]):
                 "hydrogen": 2.46 / consumption_hard_coal
             },  # alternative fuel mix
             "biomass_to_cement_fuel": {
-                "comb_biomass": 2.77 / consumption_hard_coal
+                "solid_biomass": 2.77 / consumption_hard_coal
             },  # biomass
             "waste_to_cement_fuel": {"waste": 2.46 / consumption_hard_coal},  # waste
             "coal_to_cement_fuel": {"hard_coal": 1},  # coal

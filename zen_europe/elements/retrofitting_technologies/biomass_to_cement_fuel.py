@@ -42,7 +42,7 @@ class BiomassToCementFuel(RetrofittingTechnology):
         """
         Sets the input carrier of biomass to cement fuel to the combustion biomass pool.
         """
-        return Attribute(name="input_carrier", default_value=["comb_biomass"], element=self)
+        return Attribute(name="input_carrier", default_value=["solid_biomass"], element=self)
 
     def _set_output_carrier(self) -> Attribute:
         """

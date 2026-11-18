@@ -113,12 +113,12 @@ class GasificationToHydrogenCCS(RetrofittingTechnology):
             list[dict[str, dict[str, float]]], base_tech.conversion_factor.default_value
         )
         biomass_input = next(
-            entry["gasif_biomass"]["default_value"]
+            entry["solid_biomass"]["default_value"]
             for entry in conversion_factors
-            if "gasif_biomass" in entry
+            if "solid_biomass" in entry
         )
         return (
-            ipcc_emission_factors.data["gasif_biomass"]
+            ipcc_emission_factors.data["solid_biomass"]
             * biomass_input
             * ganter_dataset.get_capture_rate_gasification_to_hydrogen()
         )

@@ -165,7 +165,7 @@ class HydrogenRolloutGanter(Dataset[pd.DataFrame]):
             The conversion factor per input carrier.
         """
         return [
-            {"gasif_biomass": {"default_value": 1 / 0.62, "unit": "GWh/GWh"}},
+            {"solid_biomass": {"default_value": 1 / 0.62, "unit": "GWh/GWh"}},
             {"electricity": {"default_value": 0.093, "unit": "GWh/GWh"}},
         ]
 

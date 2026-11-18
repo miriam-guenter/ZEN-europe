@@ -1298,7 +1298,7 @@ class DEA(Dataset[pd.DataFrame]):
         """
         efficiency = 0.6
         return [
-            {"gasif_biomass": {"default_value": 1 / efficiency, "unit": "GWh/GWh"}},
+            {"solid_biomass": {"default_value": 1 / efficiency, "unit": "GWh/GWh"}},
             {"district_heat": {"default_value": 0.2 / efficiency, "unit": "GWh/GWh"}},
         ]
 
@@ -1365,7 +1365,7 @@ class DEA(Dataset[pd.DataFrame]):
         """
         liquids_output = 0.1376 + 0.147 + 0.0998  # MWh liquids / MWh biomass
         return [
-            {"gasif_biomass": {"default_value": 1 / liquids_output, "unit": "GWh/GWh"}},
+            {"solid_biomass": {"default_value": 1 / liquids_output, "unit": "GWh/GWh"}},
             {"electricity": {"default_value": 0.0117 / liquids_output, "unit": "GWh/GWh"}},
         ]
 
@@ -1409,7 +1409,7 @@ class DEA(Dataset[pd.DataFrame]):
         net_heat = 0.15 * self._PYROLYSIS_GAS_COMBUSTION_EFFICIENCY - 0.06
         return [
             {
-                "biomass_fast_pyrolysis": {
+                "woody_biomass": {
                     "default_value": 0.93 / oil_output,
                     "unit": "GWh/GWh",
                 }
@@ -1495,7 +1495,7 @@ class DEA(Dataset[pd.DataFrame]):
         methanol_production_biomass = 0.58
         return [
             {
-                "gasif_biomass": {
+                "solid_biomass": {
                     "default_value": 1 / methanol_production_biomass,
                     "unit": "GWh/GWh",
                 }

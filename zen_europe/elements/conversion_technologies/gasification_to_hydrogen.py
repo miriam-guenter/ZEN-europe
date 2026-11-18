@@ -50,7 +50,7 @@ class GasificationToHydrogen(ConversionTechnology):
         """
         return Attribute(
             name="input_carrier",
-            default_value=["gasif_biomass", "electricity"],
+            default_value=["solid_biomass", "electricity"],
             element=self,
         )
 

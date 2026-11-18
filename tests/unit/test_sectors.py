@@ -53,7 +53,9 @@ def test_every_registered_technology_and_carrier_belongs_to_a_sector() -> None:
     """Every ZEN-europe carrier/technology is covered by at least one sector.
 
     Energy systems are excluded: they are selected individually via
-    ``elements.insert.energy_system``, not via sectors.
+    ``elements.insert.energy_system``, not via sectors. Intermediate base
+    classes (which set ``subpath = ""`` themselves) are excluded too: they are
+    never part of a model, only their subclasses are.
     """
     from zen_creator.elements import EnergySystem
 
@@ -66,6 +68,8 @@ def test_every_registered_technology_and_carrier_belongs_to_a_sector() -> None:
         if not element_cls.__module__.startswith("zen_europe.elements."):
             continue
         if issubclass(element_cls, EnergySystem):
+            continue
+        if vars(element_cls).get("subpath") == "":
             continue
         assert element_cls in owned_elements, (
             f"{name} ({element_cls.__module__}.{element_cls.__qualname__}) "

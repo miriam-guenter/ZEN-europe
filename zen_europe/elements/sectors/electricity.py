@@ -1,6 +1,5 @@
 from zen_creator import Sector
 
-from zen_europe.elements.carriers.biomass import Biomass
 from zen_europe.elements.carriers.electricity import Electricity
 from zen_europe.elements.carriers.hard_coal import HardCoal
 from zen_europe.elements.carriers.lignite import Lignite
@@ -75,7 +74,6 @@ class ElectricitySector(Sector):
             HardCoal,
             Uranium,
             Lignite,
-            Biomass,
             Oil,
             Waste,
         ]

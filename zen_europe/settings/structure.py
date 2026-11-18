@@ -31,6 +31,7 @@ class StructureSettings(SettingsCategory):
             "heat",
             "district_heating",
             "hydrogen",
+            "biomass",
             "ammonia",
             "cement",
             "methanol",

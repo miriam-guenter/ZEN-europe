@@ -48,7 +48,7 @@ class FastPyrolysis(ConversionTechnology):
         """
         return Attribute(
             name="input_carrier",
-            default_value=["biomass_fast_pyrolysis", "electricity"],
+            default_value=["woody_biomass", "electricity"],
             element=self,
         )
 
