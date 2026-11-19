@@ -30,7 +30,6 @@ from .perennial_grasses_to_biomass_slow_pyrolysis import (
 from .perennial_grasses_to_cellulosic_biomass import PerennialGrassesToCellulosicBiomass
 from .perennial_grasses_to_dry_biomass_biogas import PerennialGrassesToDryBiomassBiogas
 from .perennial_grasses_to_solid_biomass import PerennialGrassesToSolidBiomass
-from .pyrolysis_oil_to_oil import PyrolysisOilToOil
 from .sludge_to_biomass_slow_pyrolysis import SludgeToBiomassSlowPyrolysis
 from .sludge_to_wet_biomass_biogas import SludgeToWetBiomassBiogas
 from .src_crops_to_biomass_slow_pyrolysis import SrcCropsToBiomassSlowPyrolysis
@@ -89,8 +88,6 @@ BIOMASS_ROUTE_TECHNOLOGIES = [
     OilseedMealToBiomassSlowPyrolysis,
     # -> biogas_feedstock
     WetBiomassBiogasToBiogasFeedstock,
-    # -> oil
-    PyrolysisOilToOil,
 ]
 
 __all__ = ["BiomassRoute", "CoDigestionMix", "BIOMASS_ROUTE_TECHNOLOGIES"]

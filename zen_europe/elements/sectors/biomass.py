@@ -21,6 +21,9 @@ from zen_europe.elements.retrofitting_technologies.CHP_CCS import (
 )
 from zen_europe.elements.conversion_technologies.pyrolysis_fast import FastPyrolysis
 from zen_europe.elements.conversion_technologies.pyrolysis_slow import SlowPyrolysis
+from zen_europe.elements.conversion_technologies.pyrolysis_oil_upgrading import (
+    PyrolysisOilUpgrading,
+)
 from zen_europe.elements.carriers.pyrolysis_oil import PyrolysisOil
 from zen_europe.elements.conversion_technologies.FAME import FAME
 from zen_europe.elements.carriers.glycerine import Glycerine
@@ -47,7 +50,14 @@ class BiomassSector(Sector):
     feedstock into its pools."""
 
     name = "biomass"
-    required_sectors = ["electricity", "heat", "gas", "district_heating", "refining"]
+    required_sectors = [
+        "electricity",
+        "heat",
+        "gas",
+        "district_heating",
+        "hydrogen",
+        "refining",
+    ]
 
     def __init__(self) -> None:
         super().__init__()
@@ -68,6 +78,7 @@ class BiomassSector(Sector):
             PyrolysisOil,
             FastPyrolysis,
             SlowPyrolysis,
+            PyrolysisOilUpgrading,
             FAME,
             Glycerine,
             OilseedMeal,
