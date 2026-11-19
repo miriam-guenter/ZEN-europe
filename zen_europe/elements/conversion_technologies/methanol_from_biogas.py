@@ -38,19 +38,20 @@ class MethanolFromBiogas(ConversionTechnology):
 
     def _set_input_carrier(self) -> Attribute:
         """
-        Sets the input carrier of methanol from biogas to biogas, hydrogen,
-        electricity and heat (for the steam demand).
+        Sets the input carrier of methanol from biogas to biogas, hydrogen and
+        electricity. The net steam demand is covered on site by burning the
+        effluent gas, so it is not an input.
         """
         return Attribute(
             name="input_carrier",
-            default_value=["biogas", "hydrogen", "electricity", "heat"],
+            default_value=["biogas", "hydrogen", "electricity"],
             element=self,
         )
 
     def _set_output_carrier(self) -> Attribute:
         """
         Set the output carrier of methanol from biogas to methanol. The
-        effluent gas reported by DEA is not modelled.
+        effluent gas reported by DEA is burned on site to raise the net steam.
         """
         return Attribute(name="output_carrier", default_value=["methanol"], element=self)
 
@@ -79,8 +80,9 @@ class MethanolFromBiogas(ConversionTechnology):
                 "The conversion factor of methanol from biogas is based on the DEA "
                 "technology catalogue for renewable fuels (97 Methanol from biogas "
                 "and hydrogen), normalized to the methanol output. The net steam "
-                "demand is modelled as heat; oxygen, water and effluent gas are not "
-                "modelled."
+                "demand (0.153 MWh/ton) is covered on site by burning the effluent "
+                "gas (0.200 MWh/ton, 90% boiler efficiency), so neither is "
+                "modelled; oxygen and water are not modelled either."
             ),
             metadata=dea_dataset.metadata,
         )

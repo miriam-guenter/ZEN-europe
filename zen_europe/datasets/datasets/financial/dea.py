@@ -1263,16 +1263,18 @@ class DEA(Dataset[pd.DataFrame]):
         """returns the conversion factor for anaerobic digestion.
 
         Values from the DEA technology catalogue for renewable fuels (Biogas
-        plant, Basic plant, large [~6,000 Nm3 CH4/h]), share of output energy, 2020). 
-        The biogas yield of 55% of the feedstock energy is an assumption; the 
+        plant, Basic plant, large [~6,000 Nm3 CH4/h]), share of output energy, 2020).
+        The biogas yield of 55% of the feedstock energy is an assumption; the
         remaining feedstock energy is assumed to leave the plant with the digestate.
+        The process heat for the digester (5.05% of the output) is supplied by
+        natural gas, as a placeholder until a process heat carrier is modelled.
         https://ens.dk/en/analyses-and-statistics/technology-data-renewable-fuels
         """
         biogas_yield = 0.55
         return [
             {"biogas_feedstock": {"default_value": 1 / biogas_yield, "unit": "GWh/GWh"}},
             {"electricity": {"default_value": 0.0211, "unit": "GWh/GWh"}},
-            {"heat": {"default_value": 0.0505, "unit": "GWh/GWh"}},
+            {"natural_gas": {"default_value": 0.0505, "unit": "GWh/GWh"}},
             {"digestate": {"default_value": (1 - biogas_yield)/biogas_yield, "unit": "GWh/GWh"}},
         ]
 
@@ -1280,12 +1282,12 @@ class DEA(Dataset[pd.DataFrame]):
         """returns the conversion factor for biogas upgrading.
 
         Values from the DEA technology catalogue for renewable fuels (Biogas
-        upgrading - Amine scrubber [~6,000 Nm3 CH4/h]).
+        upgrading - Amine scrubber [~6,000 Nm3 CH4/h]). 
         https://ens.dk/en/analyses-and-statistics/technology-data-renewable-fuels
         """
         return [
-            {"biogas": {"default_value": 1 / 0.9905, "unit": "GWh/GWh"}},
-            {"heat": {"default_value": 0.1032 / 0.9905, "unit": "GWh/GWh"}},
+            {"biogas": {"default_value": (1 + 0.1032) / 0.9905, "unit": "GWh/GWh"}},
+            # {"heat": {"default_value": 0.1032 / 0.9905, "unit": "GWh/GWh"}},
         ]
 
     def get_conversion_factor_gasification(self):
@@ -1520,9 +1522,15 @@ class DEA(Dataset[pd.DataFrame]):
         Values from the DEA technology catalogue for renewable fuels (97
         Methanol from biogas and hydrogen), per ton of methanol: 4.0959 MWh
         biogas, 2.48 MWh hydrogen, 0.34 MWh electricity and 0.153 MWh net
-        steam, which is modelled as heat. Oxygen and water inputs and the
-        effluent gas output are not modelled; methanol (19.9 GJ/ton) is the
-        only output. Normalized to the methanol reference carrier.
+        steam (syngas preheating and distillation). Oxygen and water inputs are
+        not modelled; methanol (19.9 GJ/ton) is the only output. Normalized to
+        the methanol reference carrier.
+
+        The net steam is not modelled as an input: it is assumed to be raised on
+        site by burning the effluent gas, which is not modelled as an output
+        either. DEA reports 2.83% of the total input (7.07 MWh/ton) as effluent
+        gas, i.e. 0.200 MWh/ton, which gives 0.180 MWh/ton of steam in a boiler
+        with 90% efficiency and covers the 0.153 MWh/ton steam demand.
         https://ens.dk/en/analyses-and-statistics/technology-data-renewable-fuels
         """
         methanol_mwh_per_ton = 19.9 / Constants.GJ_PER_MWH  # DEA LHV, 19.9 GJ/ton
@@ -1542,12 +1550,6 @@ class DEA(Dataset[pd.DataFrame]):
             {
                 "electricity": {
                     "default_value": 0.34 / methanol_mwh_per_ton,
-                    "unit": "GWh/GWh",
-                }
-            },
-            {
-                "heat": {
-                    "default_value": 0.153 / methanol_mwh_per_ton,
                     "unit": "GWh/GWh",
                 }
             },

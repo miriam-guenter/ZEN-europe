@@ -45,10 +45,12 @@ class BiogasUpgrading(ConversionTechnology):
 
     def _set_input_carrier(self) -> Attribute:
         """
-        Sets the input carrier of biogas upgrading to biogas and heat.
+        Sets the input carrier of biogas upgrading to biogas. The heat for the
+        amine regeneration is covered by burning additional biogas on site, so it
+        is part of the biogas input.
         """
         return Attribute(
-            name="input_carrier", default_value=["biogas", "heat"], element=self
+            name="input_carrier", default_value=["biogas"], element=self
         )
 
     def _set_output_carrier(self) -> Attribute:
@@ -81,9 +83,11 @@ class BiogasUpgrading(ConversionTechnology):
         cf = dea_dataset.get_conversion_factor_biogas_upgrading()
         source = SourceInformation(
             description=(
-                "The conversion factor of biogas upgrading is obtained from "
-                ""
-                "the DEA dataset for renewable fuels"
+                "The conversion factor of biogas upgrading is obtained from the DEA "
+                "dataset for renewable fuels (Biogas upgrading - Amine scrubber). "
+                "The heat for the amine regeneration (10.32% of the biogas input) "
+                "is covered by burning additional biogas, which is included in the "
+                "biogas input."
             ),
             metadata=dea_dataset.metadata,
         )

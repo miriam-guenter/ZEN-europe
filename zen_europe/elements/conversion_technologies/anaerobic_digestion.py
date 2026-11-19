@@ -35,12 +35,13 @@ class AnaerobicDigestion(ConversionTechnology):
     def _set_input_carrier(self) -> Attribute:
         """
         Sets the input carrier of anaerobic digestion to biogas feedstock (wet and 
-        dry biomass from co-digestion), electricity and heat.
+        dry biomass from co-digestion), electricity and natural gas (process heat
+        for the digester).
         """
 
         return Attribute(
             name="input_carrier",
-            default_value=["biogas_feedstock", "electricity", "heat"],
+            default_value=["biogas_feedstock", "electricity", "natural_gas"],
             element=self,
         )
 
@@ -113,7 +114,8 @@ class AnaerobicDigestion(ConversionTechnology):
         digestion.
 
         Only DEA's O&M excluding electricity and heat is used, since the plant's
-        electricity and heat demand is covered by its input carriers.
+        electricity and heat demand is covered by its input carriers (electricity
+        and natural gas).
 
         Returns:
             Attribute: An Attribute object containing the specific fixed opex data.
