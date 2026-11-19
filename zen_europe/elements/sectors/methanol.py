@@ -17,6 +17,9 @@ from zen_europe.elements.conversion_technologies.methanol_from_natural_gas impor
 from zen_europe.elements.conversion_technologies.methanol_ICE_ship import (
     MethanolICEShip,
 )
+from zen_europe.elements.conversion_technologies.olefin_from_ethanol import (
+    OlefinFromEthanol,
+)
 from zen_europe.elements.conversion_technologies.olefin_from_methanol import (
     OlefinFromMethanol,
 )
@@ -53,6 +56,7 @@ class MethanolSector(Sector):
             MethanolFromBiomass,
             MethanolFromBiogas,
             OlefinFromMethanol,
+            OlefinFromEthanol,
             MethanolPipeline,
             OlefinPipeline,
             MethanolFromHydrogen,

@@ -66,11 +66,13 @@ from .oil_to_diesel_conversion import OilToDieselConversion
 from .oil_to_gasoline_conversion import OilToGasolineConversion
 from .oil_to_kerosene_conversion import OilToKeroseneConversion
 from .oil_to_naphtha_conversion import OilToNaphthaConversion
+from .olefin_from_ethanol import OlefinFromEthanol
 from .olefin_from_methanol import OlefinFromMethanol
 from .olefin_from_naphtha import OlefinFromNaphtha
 from .photovoltaics import Photovoltaics
 from .pyrolysis_slow import SlowPyrolysis
 from .pyrolysis_fast import FastPyrolysis
+from .pyrolysis_oil_upgrading import PyrolysisOilUpgrading
 from .refining import Refining
 from .run_of_river_hydro import RunOfRiverHydro
 from .SMR import SMR
@@ -128,6 +130,7 @@ __all__ = [
     "MethanolFromHydrogen",
     "MethanolToGasoline",
     "MethanolToKerosene",
+    "OlefinFromEthanol",
     "OlefinFromMethanol",
     "OlefinFromNaphtha",
     "HaberBosch",
@@ -138,6 +141,7 @@ __all__ = [
     "EAF",
     "SlowPyrolysis",
     "FastPyrolysis",
+    "PyrolysisOilUpgrading",
     "DieselICEShip",
     "HydrogenFCShip",
     "MethanolICEShip",
