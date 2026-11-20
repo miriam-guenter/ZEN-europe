@@ -136,7 +136,6 @@ class EthanolCellulosic(ConversionTechnology):
         )
         return tech_db.get_opex_specific_variable(self)
 
-#TODO: add existing capacity for ethanol in the future.
     def _set_capacity_existing(self) -> Attribute:
         """
         Sets the existing capacity of cellulosic ethanol.
@@ -160,29 +159,3 @@ class EthanolCellulosic(ConversionTechnology):
             return self.max_diffusion_rate
         diffusion_rates = TechnologyDiffusionMannhardt(source_path=self.source_path)
         return diffusion_rates.get_max_diffusion_rate(self)
-
-    def _set_capacity_addition_unbounded(self) -> Attribute:
-        """
-        Sets the unbounded capacity addition of cellulosic ethanol.
-
-        Without existing capacity and without other technologies producing
-        ethanol, the diffusion limit would never allow a first plant, so
-        additions up to the size of one typical DEA plant are exempt from it.
-        DEA's 2030 plant size is used, since its 2020 plant is demonstration scale.
-        """
-        attr = self.capacity_addition_unbounded
-        if not self.settings.investment.use_diffusion_rates:
-            return attr
-        dea_dataset = DEA(source_path=self.source_path)
-        return attr.set_data(
-            default_value=130,
-            unit="MW",
-            source=SourceInformation(
-                description=(
-                    "Capacity additions up to one typical plant (130 MW ethanol in "
-                    "2030, DEA technology catalogue for renewable fuels, 106 "
-                    "Cellulosic ethanol) are exempt from the diffusion limit."
-                ),
-                metadata=dea_dataset.metadata,
-            ),
-        )

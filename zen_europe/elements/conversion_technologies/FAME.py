@@ -2,6 +2,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from zen_europe.datasets.dataset_collections.bioenergy_existing_capacity import (
+    BioenergyExistingCapacity,
+)
 from zen_europe.datasets.dataset_collections.technology_cost_database import (
     TechnologyCostDatabase,
 )
@@ -141,7 +144,14 @@ class FAME(ConversionTechnology):
         """
         Sets the existing capacity of FAME.
 
+        The existing capacity is the Eurostat production capacity for
+        biodiesels (which still includes HVO).
         """
+        if self.settings.investment.use_existing_capacities:
+            bioenergy_capacity = BioenergyExistingCapacity(
+                settings=self.settings, source_path=self.source_path
+            )
+            return bioenergy_capacity.get_capacity_existing_FAME(self)
         attr = self.capacity_existing
         attr.set_data(
             default_value=0,

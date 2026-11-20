@@ -158,6 +158,30 @@ _SHIPPING_FUEL_NRG_BAL = {
     "FC_TRA_DNAVI_E": "Domestic navigation",
 }
 
+# nrg_inf_lbpc: production capacities for liquid biofuels [thousand tonnes / year].
+# "Biodiesels" includes HVO, "biogasoline" is mostly bioethanol.
+_LIQUID_BIOFUEL_CAPACITY_DATASET = "nrg_inf_lbpc"
+_LIQUID_BIOFUEL_CAPACITY_UNIT = "THS_TY"
+_LIQUID_BIOFUEL_CAPACITY_PLANT_TEC = ["CAP_PRD"]
+_LIQUID_BIOFUEL_CAPACITY_SIEC = {
+    "R5210P": "biogasoline",
+    "R5220P": "biodiesels",
+    "R5230P": "bio_jet_kerosene",
+}
+
+# nrg_cb_rw: supply of renewables and wastes, which splits the biogases by origin.
+_BIOGAS_PRODUCTION_DATASET = "nrg_cb_rw"
+_BIOGAS_PRODUCTION_UNIT = "TJ"
+_BIOGAS_PRODUCTION_NRG_BAL = {"IPRD": "Indigenous production"}
+_BIOGAS_TOTAL_SIEC = {"R5300": "biogases"}
+# Biogas from anaerobic digestion: sewage sludge gas and other biogases from
+# anaerobic fermentation. Landfill gas (R5311) and biogas from thermal processes
+# (R5320) are not produced by digesters.
+_BIOGAS_DIGESTION_SIEC = {
+    "R5312": "sewage_sludge_gas",
+    "R5319": "other_biogases_from_anaerobic_fermentation",
+}
+
 # Eurostat data-availability cutoffs (intrinsic to the source database, not
 # model settings).
 _EUROSTAT_START_YEAR = 1990
@@ -461,7 +485,95 @@ class Eurostat(Dataset[pd.DataFrame]):
         intermediate, rural), for all available Eurostat years."""
         return self._query_population_by_urbanization()
 
+    @instance_cache
+    def get_liquid_biofuel_capacity(
+        self, siec: str, geo: tuple[str, ...]
+    ) -> pd.DataFrame:
+        """Production capacity for a liquid biofuel per country and year.
+
+        Args:
+            siec: Eurostat product code, a key of _LIQUID_BIOFUEL_CAPACITY_SIEC
+                (e.g. "R5210P" for biogasoline, "R5220P" for biodiesels).
+            geo: Countries to query.
+
+        Returns:
+            pd.DataFrame: countries as rows, years as integer columns, in thousand
+                tonnes per year. Years that Eurostat does not report are NaN.
+        """
+        return self._query_liquid_biofuel_capacity(siec=siec, geo=list(geo))
+
+    @instance_cache
+    def get_biogas_production_digestion(self, geo: tuple[str, ...]) -> pd.DataFrame:
+        """Biogas produced by anaerobic digestion per country and year [GWh].
+
+        Sewage sludge gas plus other biogases from anaerobic fermentation; landfill
+        gas and biogas from thermal processes are excluded. Eurostat often reports
+        the most recent year only for the biogas total, so where the split by origin
+        is missing it is estimated from the total with the country's latest known
+        digestion share.
+
+        Args:
+            geo: Countries to query.
+
+        Returns:
+            pd.DataFrame: countries as rows, years as integer columns, in GWh.
+        """
+        return self._query_biogas_production_digestion(geo=list(geo))
+
     # -------- data queries ------------------
+
+    def _query_liquid_biofuel_capacity(self, siec: str, geo: list[str]) -> pd.DataFrame:
+        """Extract the liquid biofuel production capacities from Eurostat."""
+        assert siec in _LIQUID_BIOFUEL_CAPACITY_SIEC, (
+            f"Unknown liquid biofuel siec '{siec}'. Choose one of "
+            f"{list(_LIQUID_BIOFUEL_CAPACITY_SIEC)}."
+        )
+        data = self._query_non_siec_data(
+            dataset=_LIQUID_BIOFUEL_CAPACITY_DATASET,
+            unit=_LIQUID_BIOFUEL_CAPACITY_UNIT,
+            start_period=_EUROSTAT_START_YEAR,
+            geo=geo,
+            params={
+                "siec": list(_LIQUID_BIOFUEL_CAPACITY_SIEC),
+                "plant_tec": _LIQUID_BIOFUEL_CAPACITY_PLANT_TEC,
+            },
+        )
+        data = data[data["siec"] == siec]
+        capacity = data.drop(["freq", "siec", "plant_tec", "unit"], axis=1).set_index(
+            "geo\\TIME_PERIOD"
+        )
+        capacity.index.name = "node"
+        capacity.columns = capacity.columns.astype(int)
+        return capacity.astype(float).sort_index()
+
+    def _query_biogas_production_digestion(self, geo: list[str]) -> pd.DataFrame:
+        """Extract the biogas production from anaerobic digestion from Eurostat."""
+        siec = {**_BIOGAS_TOTAL_SIEC, **_BIOGAS_DIGESTION_SIEC}
+        data = self._query_siec_data(
+            nrg_bal=_BIOGAS_PRODUCTION_NRG_BAL,
+            siec=siec,
+            start_period=_EUROSTAT_START_YEAR,
+            geo=geo,
+            dataset=_BIOGAS_PRODUCTION_DATASET,
+            unit=_BIOGAS_PRODUCTION_UNIT,
+        )
+        data = data.drop(["freq", "unit", "nrg_bal"], axis=1).set_index(
+            ["siec", "geo\\TIME_PERIOD"]
+        )
+        data.columns = data.columns.astype(int)
+        data = data.astype(float) / Constants.GJ_PER_MWH  # TJ to GWh
+
+        total = cast(pd.DataFrame, data.loc[list(_BIOGAS_TOTAL_SIEC)[0]])
+        digestion = cast(
+            pd.DataFrame,
+            data.loc[list(_BIOGAS_DIGESTION_SIEC)].groupby(level=1).sum(min_count=1),
+        )
+        total, digestion = total.align(digestion, join="outer")
+        share = (digestion / total.where(total > 0)).clip(upper=1)
+        share = share.ffill(axis=1).bfill(axis=1)
+        production = digestion.fillna(total * share)
+        production.index.name = "node"
+        return production.sort_index()
 
     def _query_efficiencies(self) -> pd.Series:
         """Compute fleet efficiencies of power plants/carriers.

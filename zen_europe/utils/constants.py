@@ -53,6 +53,13 @@ class Constants:
     BIOCHAR_GWH_PER_TON: float = 25 / 3600
     """ https://ens.dk/en/analyses-and-statistics/technology-data-renewable-fuels"""
 
+    ETHANOL_KWH_PER_KG: float = 27 / 3.6
+    """lhv, from MJ/kg to kWh/kg, Directive (EU) 2018/2001 (RED II), Annex III"""
+
+    BIODIESEL_KWH_PER_KG: float = 37 / 3.6
+    """lhv of FAME, from MJ/kg to kWh/kg, Directive (EU) 2018/2001 (RED II),
+    Annex III"""
+
     DIESEL_KWH_PER_LITER: float = 36 / 3.6
     """lhv, from MJ/l to KWH/l, https://www.engineeringtoolbox.com/fuels-higher-calorific-values-d_169.html"""
 

@@ -2,6 +2,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from zen_europe.datasets.dataset_collections.bioenergy_existing_capacity import (
+    BioenergyExistingCapacity,
+)
 from zen_europe.datasets.dataset_collections.technology_cost_database import (
     TechnologyCostDatabase,
 )
@@ -139,12 +142,19 @@ class Ethanol1GStarch(ConversionTechnology):
         )
         return tech_db.get_opex_specific_variable(self)
 
-#TODO: add existing capacity for ethanol in the future.
     def _set_capacity_existing(self) -> Attribute:
         """
         Sets the existing capacity of first generation ethanol.
 
+        The existing capacity is the Eurostat production capacity for
+        biogasoline, of which the starch share is taken from the ePURE
+        production statistics.
         """
+        if self.settings.investment.use_existing_capacities:
+            bioenergy_capacity = BioenergyExistingCapacity(
+                settings=self.settings, source_path=self.source_path
+            )
+            return bioenergy_capacity.get_capacity_existing_ethanol(self)
         attr = self.capacity_existing
         attr.set_data(
             default_value=0,
@@ -163,28 +173,3 @@ class Ethanol1GStarch(ConversionTechnology):
             return self.max_diffusion_rate
         diffusion_rates = TechnologyDiffusionMannhardt(source_path=self.source_path)
         return diffusion_rates.get_max_diffusion_rate(self)
-
-    def _set_capacity_addition_unbounded(self) -> Attribute:
-        """
-        Sets the unbounded capacity addition of first generation ethanol.
-
-        Without existing capacity and without other technologies producing
-        ethanol, the diffusion limit would never allow a first plant, so
-        additions up to the size of one typical DEA plant are exempt from it.
-        """
-        attr = self.capacity_addition_unbounded
-        if not self.settings.investment.use_diffusion_rates:
-            return attr
-        dea_dataset = DEA(source_path=self.source_path)
-        return attr.set_data(
-            default_value=280,
-            unit="MW",
-            source=SourceInformation(
-                description=(
-                    "Capacity additions up to one typical plant (280 MW ethanol, DEA "
-                    "technology catalogue for renewable fuels, 105 First generation "
-                    "ethanol) are exempt from the diffusion limit."
-                ),
-                metadata=dea_dataset.metadata,
-            ),
-        )

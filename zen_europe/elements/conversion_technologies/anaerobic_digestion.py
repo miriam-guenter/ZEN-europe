@@ -2,6 +2,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from zen_europe.datasets.dataset_collections.bioenergy_existing_capacity import (
+    BioenergyExistingCapacity,
+)
 from zen_europe.datasets.dataset_collections.technology_cost_database import (
     TechnologyCostDatabase,
 )
@@ -10,7 +13,12 @@ from zen_europe.datasets.datasets.financial.dea import DEA
 if TYPE_CHECKING:
     from zen_creator.model import Model
 
-from zen_creator import Attribute, ConversionTechnology, SourceInformation
+from zen_creator import (
+    AssumptionInformation,
+    Attribute,
+    ConversionTechnology,
+    SourceInformation,
+)
 
 
 class AnaerobicDigestion(ConversionTechnology):
@@ -137,4 +145,30 @@ class AnaerobicDigestion(ConversionTechnology):
             Attribute: An Attribute object containing the specific variable opex data.
         """
         attr = self.opex_specific_variable
+        return attr
+
+    def _set_capacity_existing(self) -> Attribute:
+        """
+        Sets the existing capacity of anaerobic digestion.
+
+        The existing capacity is derived from the biogas production from anaerobic
+        digestion (Eurostat, and the BFE statistics for Switzerland), so that the
+        existing biogas upgrading and biogas CHP plants have digesters to feed them.
+
+        Returns:
+            Attribute: An Attribute object containing the existing capacity data.
+        """
+        if self.settings.investment.use_existing_capacities:
+            bioenergy_capacity = BioenergyExistingCapacity(
+                settings=self.settings, source_path=self.source_path
+            )
+            return bioenergy_capacity.get_capacity_existing_anaerobic_digestion(self)
+        attr = self.capacity_existing
+        attr.set_data(
+            default_value=0,
+            df=None,
+            source=AssumptionInformation(
+                description=("We do not consider existing capacities."),
+            ),
+        )
         return attr
